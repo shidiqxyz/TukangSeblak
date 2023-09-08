@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katik | Kalkulator Tematik</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <div class="judul-header">
+            <h1>Katik</h1>
+        </div>
+        <div class="subjudul-header">
+            <h2>Kalkulator Tematik</h2>
+        </div>
+    </header>
+    <main>
+        <div class="container">
+            <h1>Welcome To Katik</h1>
+            <p>Hai Sobat, Selamat datang di katik :)</p>
+            <p>Sebuah web apps sederhana yang berfungsi untuk menghitung nilai luas dan keliling bangun datar</p>
+            <p class="persegi-biru">Persegi</p>
+            <p class="persegi-judul">P. Panjang</p>
+            <div class="persegi">
+                <h1>Luas Persegi</h1>
+                    <img src="/bujur-sangkar.png" alt="Bujur Sangkar" height="300px">
+                    <p>Rumus Luas Persegi yaitu :</p>
+                    <div class="luas-rumus">
+                        <p>L = S X S</p>
+                    </div>
+                    <p>Di mana :</p>
+                    <p>L = Luas</p>
+                    <p>S = Sisi</p>
+                    <div class="judul-rumus">
+                        <h1>Hitung Luas Persegi</h1>
+                    </div>
+                    <input type="number" placeholder="Nilai Sisi" id="nilaiSisi" value="Nilai">
+                    <input type="submit" value="Hitung" onclick="hitungLuas();">
+                    <input type="reset" value="Reset" onclick="resetNilai();">
+                    <p id="rumus"></p>
+                    <p id="perhitungan"></p>
+                    <p id="hasil"></p>
+            </div>
+            <div class="persegi">
+                <h1>Keliling Persegi</h1>
+                    <img src="/bujur-sangkar.png" alt="Bujur Sangkar" height="300px">
+                    <p>Rumus Keliling Persegi yaitu :</p>
+                    <div class="luas-rumus">
+                        <p>K = 4 X S</p>
+                    </div>
+                    <p>Di mana :</p>
+                    <p>K = Keliling</p>
+                    <p>S = Sisi</p>
+                    <div class="judul-rumus">
+                        <h1>Hitung Keliling Persegi</h1>
+                    </div>
+                    <input type="number" id="sisiInput" placeholder="Nilai Sisi" value="">
+                    <input type="submit" value="Hitung" onclick="hitungKeliling()">
+                    <input type="reset" value="Reset" onclick="resetForm()">
+                    <p id="rumus-keliling"></p>
+                    <p id="perhitungan-keliling"></p>
+                    <p id="hasilKeliling"></p>
+            </div>
+        </div>
+    </main>
+    <script src="/js/script.js"></script>
+</body>
+</html>

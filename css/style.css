@@ -33,6 +33,7 @@ main {
 .container {
     background-color: white;
     margin-top: 50px;
+    margin-bottom: 50px;
     height: 90%;
     width: 90%;
     border: #eaeaea 2px solid ;
@@ -127,4 +128,12 @@ input[type="reset"] {
     height: 40px;
     font-weight: bold;
     float: right;
+}
+
+footer {
+    background-color: #3498db;
+    color: white;
+    font-weight: bold;
+    padding: 20px;
+    text-align: center;
 }

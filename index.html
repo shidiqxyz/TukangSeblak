@@ -2,7 +2,44 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jupuary Airdrop Checker</title>
+    <style>
+        /* Responsive layout */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input, button {
+            width: 90%;
+            max-width: 400px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        #result {
+            text-align: center;
+            word-wrap: break-word;
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
 
@@ -20,7 +57,6 @@
 
         if (!wallet) {
             resultElement.textContent = "Please enter a Solana wallet address.";
-            resultElement.style.color = "red";
             return;
         }
 
@@ -30,14 +66,11 @@
 
             if (data.eligible) {
                 resultElement.textContent = `✅ Wallet is Eligible! 😎`;
-                resultElement.style.color = "green";
             } else {
                 resultElement.textContent = `❌ Wallet is Not Eligible. 🤡`;
-                resultElement.style.color = "red";
             }
         } catch (error) {
             resultElement.textContent = "An error occurred while checking the airdrop.";
-            resultElement.style.color = "red";
             console.error("Error:", error);
         }
     }

@@ -2,24 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Cek Airdrop Jupuary</title>
+    <title>Jupuary Airdrop Checker</title>
 </head>
 <body>
 
-<h2>Cek Airdrop Jupuary</h2>
+<h2>Jupuary Airdrop Checker</h2>
 
-<input type="text" id="walletInput" placeholder="Masukkan Wallet Solana">
-<button onclick="cekAirdrop()">Cek Airdrop</button>
+<input type="text" id="walletInput" placeholder="Enter Solana Wallet Address">
+<button onclick="checkAirdrop()">Check Airdrop</button>
 
 <p id="result"></p>
 
 <script>
-    async function cekAirdrop() {
+    async function checkAirdrop() {
         const wallet = document.getElementById('walletInput').value;
         const resultElement = document.getElementById('result');
 
         if (!wallet) {
-            resultElement.textContent = "Mohon masukkan wallet Solana.";
+            resultElement.textContent = "Please enter a Solana wallet address.";
             resultElement.style.color = "red";
             return;
         }
@@ -29,14 +29,14 @@
             const data = await response.json();
 
             if (data.eligible) {
-                resultElement.textContent = `✅ Wallet Eligible! Anda mendapatkan ${data.amount} token.`;
+                resultElement.textContent = `✅ Wallet is Eligible! 😎`;
                 resultElement.style.color = "green";
             } else {
-                resultElement.textContent = "❌ Wallet Tidak Eligible.";
+                resultElement.textContent = `❌ Wallet is Not Eligible. 🤡`;
                 resultElement.style.color = "red";
             }
         } catch (error) {
-            resultElement.textContent = "Terjadi kesalahan saat memeriksa airdrop.";
+            resultElement.textContent = "An error occurred while checking the airdrop.";
             resultElement.style.color = "red";
             console.error("Error:", error);
         }

@@ -38,7 +38,7 @@ export default function LineaClient() {
         const isFlaggedClass = !lxpData.isFlagged ? 'text-green-400' : 'text-red-400';
         const mapping = { 1: 'Alpha', 2: 'Beta', 3: 'Gamma', 4: 'Delta', 5: 'Omega' };
         const checkResults = Object.entries(checkData)
-          .filter(([_, value]) => value)
+          .filter(([value]) => value)
           .map(([key]) => mapping[key])
           .join(', ') || '-';
         totalLxpValue += parseInt(lxpData.lxp || 0);

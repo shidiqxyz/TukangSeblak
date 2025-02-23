@@ -7,7 +7,7 @@ export default function MonadSendClient() {
   const [result, setResult] = useState('');
   const [modalContent, setModalContent] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentAccount, setCurrentAccount] = useState(null);
+  const [setCurrentAccount] = useState(null);
 
   const CHAIN_ID = '0x279F'; // 10143 in hex for Monad Testnet
   const RPC_ENDPOINT = 'https://testnet-rpc.monad.xyz';

@@ -18,4 +18,10 @@ export const initialCards = [
     category: 'tool',
     href: '/apr-apy-calculator', // Tambahkan href untuk mengarah ke halaman APR & APY Calculator
   },
+  {
+    id: 4,
+    title: '🔗 Resolv Points Checker 🧾', // Emoji untuk pemeriksaan poin dan alamat
+    category: 'tool',
+    href: '/resolv', // Tambahkan href untuk mengarah ke halaman Resolv Checker
+  },
 ];

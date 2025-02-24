@@ -198,7 +198,7 @@ export default function ResolvChecker() {
       <Header />
 
       {/* Main Content */}
-      <main className="flex-grow flex flex-col items-center justify-center p-4">
+      <main className="flex-grow flex flex-col items-center p-6">
         <div className="w-full max-w-7xl bg-gray-800 rounded-lg shadow-lg p-8 space-y-6">
           <h1 className="text-3xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r text-white">
             Resolv Points Checker 🧮

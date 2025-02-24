@@ -15,6 +15,7 @@ const configs = [
   ...compat.extends("next/core-web-vitals"),
   ...compat.extends("next/typescript"),
   
+  
 ]
 
 export default configs

@@ -4,7 +4,7 @@ import Footer from '../../components/Footer';
 
 // Metadata untuk halaman Monad Mass Sender
 export const metadata = {
-  title: "Monad Mass Sender",
+  title: "Monad Mass Sender - TukangSeblak",
   description: "Send MON tokens to multiple addresses on the Monad Testnet.",
 };
 

@@ -1,12 +1,13 @@
-import LineaClient from './LineaClient'; // Impor komponen client-side
+import LineaClient from './AprApyCalculator'; // Impor komponen client-side
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 
 // Metadata untuk halaman Linea
+// Metadata Dinamis
 export const metadata = {
-  title: "Linea POH & LXP - TukangSeblak",
-  description: "Check POH and LXP status for multiple addresses on Linea.",
-};
+    title: "APR & APY Calculator - TukangSeblak",
+    description: "Calculate your APR and APY returns easily with this tool. Perfect for crypto and investment enthusiasts!",
+  };
 
 export default function Linea() {
   return (

@@ -3,7 +3,7 @@ import ResolvCheckerClient from './ResolvCheckerClient'; // Impor komponen clien
 
 // Metadata untuk halaman Resolv Checker
 export const metadata = {
-  title: "Resolv Points Checker",
+  title: "Resolv Points Checker - TukangSeblak",
   description: "Check your Resolv.im points and daily activities for multiple Ethereum addresses or ENS names.",
 };
 

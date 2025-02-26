@@ -15,13 +15,13 @@ export const initialCards = [
   {
     id: 3,
     title: '🧮 APR & APY Calculator 📊', // Emoji untuk kalkulator dan grafik
-    category: 'tool',
+    category: 'live',
     href: '/apr-apy-calculator', // Tambahkan href untuk mengarah ke halaman APR & APY Calculator
   },
   {
     id: 4,
     title: '🔗 Resolv Points Checker 🧾', // Emoji untuk pemeriksaan poin dan alamat
-    category: 'tool',
+    category: 'live',
     href: '/resolv', // Tambahkan href untuk mengarah ke halaman Resolv Checker
   },
 ];

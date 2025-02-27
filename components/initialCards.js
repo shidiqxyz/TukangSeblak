@@ -1,27 +1,32 @@
-// Data awal untuk card
 export const initialCards = [
   {
     id: 1,
-    title: '📊 Linea POH & LXP 📈', // Emoji untuk statistik dan grafik
+    title: '📊 Linea POH & LXP 📈',
     category: 'live',
-    href: '/linea', // Tambahkan href untuk mengarah ke halaman Linea
+    href: '/linea',
   },
   {
     id: 2,
-    title: '🚀 Monad Mass Send 💸', // Emoji untuk pengiriman massal dan uang
+    title: '🚀 Monad Mass Send 💸',
     category: 'live',
-    href: '/monad-send', // Tambahkan href untuk mengarah ke halaman Monad Mass Send
+    href: '/monad-send',
   },
   {
     id: 3,
-    title: '🧮 APR & APY Calculator 📊', // Emoji untuk kalkulator dan grafik
+    title: '🧮 APR & APY Calculator 📊',
     category: 'live',
-    href: '/apr-apy-calculator', // Tambahkan href untuk mengarah ke halaman APR & APY Calculator
+    href: '/apr-apy-calculator',
   },
   {
     id: 4,
-    title: '🔗 Resolv Points Checker 🧾', // Emoji untuk pemeriksaan poin dan alamat
+    title: '🔗 Resolv Points Checker 🧾',
     category: 'live',
-    href: '/resolv', // Tambahkan href untuk mengarah ke halaman Resolv Checker
+    href: '/resolv',
+  },
+  {
+    id: 5,
+    title: '🧮 MCAP & FDV Calculator 📈', // Emoji untuk kalkulator dan grafik
+    category: 'live',
+    href: '/mcap-fdv-calculator', // Mengarah ke halaman MCAP & FDV Calculator
   },
 ];

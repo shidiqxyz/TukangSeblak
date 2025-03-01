@@ -27,6 +27,12 @@ export const initialCards = [
     id: 5,
     title: '🧮 MCAP & FDV Calculator 📈', // Emoji untuk kalkulator dan grafik
     category: 'live',
-    href: '/mcap-fdv-calculator', // Mengarah ke halaman MCAP & FDV Calculator
+    href: '/mcap-fdv-calculator',
+  },
+  {
+    id: 6,
+    title: '🎲 Randomizer Anime 🎴', // Menggunakan 🎲 untuk random & 🎴 untuk kartu anime
+    category: 'live',
+    href: '/randomizer-anime',
   },
 ];

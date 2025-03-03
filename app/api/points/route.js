@@ -33,14 +33,52 @@ export async function GET(request) {
     }
 
     try {
-        const response = await axios.get('https://api.resolv.im/points', {
+        // Fetch points data from the first API
+        const pointsResponse = await axios.get('https://api.resolv.im/points', {
             params: { address: resolvedAddress, mock: 'false' },
             headers: { Accept: 'application/json' }
         });
 
-        return new Response(JSON.stringify(response.data), { status: 200 });
+        // Fetch leaderboard data from the second API
+        const leaderboardResponse = await axios.get('https://api.resolv.im/points/leaderboard/slice', {
+            params: { address: resolvedAddress },
+            headers: { Accept: 'application/json' }
+        });
+
+        const { requestedAddressIndex, rows } = leaderboardResponse.data;
+
+        // Check if the requested address exists in the leaderboard
+        if (requestedAddressIndex === -1 || !rows || rows.length === 0) {
+            return new Response(JSON.stringify({
+                error: 'Address not found in leaderboard',
+                pointsData: pointsResponse.data
+            }), { status: 404 });
+        }
+
+        // Find the specific entry for the requested address in the leaderboard
+        const userEntry = rows.find(row => row.address.toLowerCase() === resolvedAddress.toLowerCase());
+
+        if (!userEntry) {
+            return new Response(JSON.stringify({
+                error: 'Address not found in leaderboard',
+                pointsData: pointsResponse.data
+            }), { status: 404 });
+        }
+
+        // Combine data from both APIs
+        const combinedData = {
+            points: pointsResponse.data,
+            leaderboard: {
+                rank: userEntry.rank,
+                address: userEntry.address,
+                points: userEntry.points
+            }
+        };
+
+        return new Response(JSON.stringify(combinedData), { status: 200 });
+
     } catch (err) {
-        console.error(`Error fetching points: ${err.message}`);
+        console.error(`Error fetching data: ${err.message}`);
         return new Response(JSON.stringify({ error: 'Failed to fetch data from Resolv.im', details: err.message }), { status: 500 });
     }
 }

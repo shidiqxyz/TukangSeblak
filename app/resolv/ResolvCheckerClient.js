@@ -29,20 +29,35 @@ export default function ResolvChecker() {
   };
 
   const formatPointsData = (data) => {
+    const { points, leaderboard } = data;
+
     return (
       <div className="bg-gray-700 rounded-lg p-6 space-y-4">
-        {/* Total Points */}
-        <div className="flex items-center space-x-2">
-          <span className="text-lg">🏆</span>
-          <h5 className="text-lg font-bold">
-            Total Points: <strong>{formatNumber(data.totalPoints)}</strong>
-          </h5>
-        </div>
+        {/* Rank Information */}
+        {leaderboard ? (
+          <div className="flex items-center space-x-2">
+            <span className="text-lg">🏆</span>
+            <h5 className="text-lg font-bold">
+              Rank: <strong>{leaderboard.rank}</strong>
+            </h5>
+          </div>
+        ) : (
+          <div className="bg-yellow-600 text-white rounded-lg p-2">
+            Address not found in leaderboard.
+          </div>
+        )}
 
-        {/* Daily Points */}
+        {/* Total Points */}
+         
         <div className="flex items-center space-x-2">
           <span className="text-lg">📅</span>
-          <p>Daily Points: {formatNumber(data.dailyPoints)}</p>
+          <p className="text-lg font-bold">Daily Points: <strong>{formatNumber(points.dailyPoints)}</strong></p>
+        </div>
+        <div className="flex items-center space-x-2">
+          <span className="text-lg">📅</span>
+          <h5 className="text-lg font-bold">
+            Total Points: <strong>{formatNumber(points.totalPoints)}</strong>
+          </h5>
         </div>
 
         {/* Active Boosts */}
@@ -52,11 +67,11 @@ export default function ResolvChecker() {
             <span>Active Boosts:</span>
           </h6>
           <div className="flex flex-wrap">
-            {createBoostBadge(data.boosts.epoch.name, data.boosts.epoch.value)}
-            {createBoostBadge('Referee Welcome', data.boosts.refereeWelcomeBoost)}
-            {createBoostBadge('Dinero Power', data.boosts.dineroPowerUser)}
-            {createBoostBadge('Hyper liquid', data.boosts.hyperliquidPowerUser)}
-            {createBoostBadge(`Resolv (${data.boosts.resolvPowerUser.level})`, data.boosts.resolvPowerUser.value)}
+            {createBoostBadge(points.boosts.epoch.name, points.boosts.epoch.value)}
+            {createBoostBadge('Referee Welcome', points.boosts.refereeWelcomeBoost)}
+            {createBoostBadge('Dinero Power', points.boosts.dineroPowerUser)}
+            {createBoostBadge('Hyper liquid', points.boosts.hyperliquidPowerUser)}
+            {createBoostBadge(`Resolv (${points.boosts.resolvPowerUser.level})`, points.boosts.resolvPowerUser.value)}
           </div>
         </div>
 
@@ -67,10 +82,9 @@ export default function ResolvChecker() {
             <span>Daily Activities:</span>
           </h6>
           <div className="space-y-2">
-            {Object.entries(data.dailyActivities)
+            {Object.entries(points.dailyActivities)
               .filter(([_, value]) => value > 0)
               .map(([key, value]) => {
-                // Emoji mapping for activities
                 const activityEmoji = {
                   referralPoints: '👥',
                   holdUsrEth: '💎',

@@ -10,7 +10,7 @@ export default function Footer() {
           <div className="flex justify-center space-x-6">
             {/* Website */}
             <a
-              href="https://shidiq.blog/"
+              href="https://shidiq.xyz/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-blue-500 transition-colors duration-300"
@@ -20,7 +20,7 @@ export default function Footer() {
   
             {/* Twitter */}
             <a
-              href="https://x.com/shdqm0"
+              href="https://x.com/shidiqxyz"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-sky-500 transition-colors duration-300"

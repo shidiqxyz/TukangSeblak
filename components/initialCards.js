@@ -25,14 +25,20 @@ export const initialCards = [
   },
   {
     id: 5,
-    title: '🧮 MCAP & FDV Calculator 📈', // Emoji untuk kalkulator dan grafik
+    title: '🧮 MCAP & FDV Calculator 📈',
     category: 'live',
     href: '/mcap-fdv-calculator',
   },
   {
     id: 6,
-    title: '🎲 Randomizer Anime 🎴', // Menggunakan 🎲 untuk random & 🎴 untuk kartu anime
+    title: '🎲 Randomizer Anime 🎴',
     category: 'live',
     href: '/randomizer-anime',
+  },
+  {
+    id: 7,
+    title: '💰 Nillion Wallet',
+    category: 'live',
+    href: '/nillion',
   },
 ];

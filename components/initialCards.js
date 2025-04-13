@@ -41,4 +41,10 @@ export const initialCards = [
     category: 'live',
     href: '/nillion',
   },
+  {
+    id: 8,
+    title: '🧠 Gensyn Check',
+    category: 'live',
+    href: '/gensyn',
+  },
 ];

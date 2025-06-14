@@ -1,116 +1,186 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import tasksData from './tasks.json';
+
+const categories = {
+  character: [
+    "High school girl", "Magical girl", "Shy transfer student", "Delinquent boy", "Kendo club ace",
+    "Cheerful childhood friend", "Kuudere sniper", "Yandere nurse", "Chuunibyou boy", "Tomboy mechanic",
+    "Traditional shrine maiden", "Android classmate", "Virtual idol", "Space bounty hunter", "Elf archer",
+    "Knight in armor", "Modern witch", "Fox spirit (kitsune)", "Vampire noble", "Street samurai",
+    "Lonely librarian", "Overconfident gamer", "Battle-scarred soldier", "Alien exchange student",
+    "Fashion model", "Zombie idol", "Dragon tamer", "Hero from another world", "Catgirl barista",
+    "Mysterious wanderer", "Mecha pilot", "Ghost in a school uniform", "Rebellious prince/princess"
+  ],
+
+  location: [
+    "Crowded train station", "Dim-lit café", "Japanese school festival", "Library with floating books",
+    "Futuristic metropolis", "Abandoned theme park", "Cherry blossom park", "Steamy onsen bath",
+    "Tatami-floored room", "Floating islands in the sky", "Moonlit lake", "Clocktower overlooking the city",
+    "Festival street at night", "Rainy convenience store", "Sacred mountain shrine",
+    "Dungeon with glowing crystals", "Rooftop garden", "Suburban alleyway", "Underground lab",
+    "Post-apocalyptic city ruins", "Winding bamboo forest", "Digital world", "Cyberpunk district",
+    "Mystical forest glade", "RPG-style town square", "Train running through snow", "Sky harbor for airships"
+  ],
+
+  expression: [
+    "Smiling softly", "Crying with joy", "Eyes full of sorrow", "Shouting in rage", "Laughing nervously",
+    "Deadpan stare", "Eyes wide in shock", "Cheeks puffed in frustration", "Winking playfully",
+    "Eyes glowing with power", "Blushing intensely", "Sweating nervously", "Tears streaming down face",
+    "Screaming in despair", "Dazed or hypnotized", "Sleepy eyes", "Sneering smugly",
+    "Gritting teeth", "Panicking", "Looking away shyly", "Heart-shaped pupils", "Lost in thought",
+    "Crying while smiling", "Fake smile hiding sadness", "Eyes sparkling with admiration"
+  ],
+
+  weather: [
+    "Heavy rain with thunder", "Gentle snowfall", "Golden hour light", "Mist rolling over hills",
+    "Cloudless sunny day", "Snowstorm with howling wind", "Lightning in the distance",
+    "Drizzle on umbrella", "Wind blowing cherry blossoms", "Red sky before storm",
+    "Star-filled sky", "Rainbow after rain", "Thick fog", "Glowing moonlight", "Burning sunset",
+    "Sky filled with meteors", "Sudden downpour", "Blue sky with floating clouds",
+    "Stormy night", "Warm morning haze"
+  ],
+
+  time: [
+    "5 AM sunrise jog", "School lunch break", "After-school cleanup duty", "Evening club meeting",
+    "Late-night stargazing", "Fireworks festival night", "Just before final battle", "Afternoon tea",
+    "First snow of the year", "Midnight during exam week", "Noon at summer camp",
+    "Twilight walk home", "Dawn before the journey", "Moment time stops", "Birthday surprise",
+    "Graduation ceremony", "Valentine's confession", "Tanabata evening", "Cultural festival performance",
+    "New Year countdown"
+  ],
+
+  attribute: [
+    "Wearing sailor uniform", "Flowing magical cape", "Fox ears and tail", "Cybernetic arm", "Eye patch",
+    "Hair blowing in wind", "Holding umbrella", "Holding sword longer than body", "Wearing headphones",
+    "Transparent jacket", "Bandages on arms", "Floating upside down", "Surrounded by petals",
+    "Holding bento box", "Standing in water", "With dragon companion", "Glowing wings", "Back turned",
+    "With floating holograms", "Arm glowing with magic", "Holding a paper charm",
+    "Carrying plushie", "In bunny hoodie", "With glowing tattoos", "Hovering above ground",
+    "Shoes off", "Scarf flowing in wind", "Eyes covered by hair", "Mouth covered by mask",
+    "With camera in hand", "Wearing oversized coat", "Covered in sparkles", "Glitching body parts"
+  ]
+};
+
+const modeRules = {
+  easy: ['character', 'location', 'expression'],
+  normal: ['character', 'location', 'expression', 'weather', 'time'],
+  hard: ['character', 'location', 'expression', 'weather', 'time', 'attribute'],
+};
 
 const motivasiAnimeUwu = [
-  "Ganbatte ne~! 💪✨ Kamu itu protagonist-nya hidupmu sendiri, jangan nyerah yaa~! 🌸📖",
-  "Yattaaa~! 🎉 Sedikit lagi, impianmu bakal jadi kenyataan! Teruskan semangatnya~ (≧◡≦) 💖",
-  "UwU~ Jangan lupa nyengir pas gambar, biar energinya masuk ke tiap garisnya~ 🎨🖌️",
-  "Mode shounen: ON! 💥🔥 Lawan rasa malas kayak lagi duel lawan boss terakhir!",
-  "Hari ini juga bagian dari *arc penting* kisah hidupmu~ Jangan skip yaa~ (｡•̀ᴗ-)✧",
-  "Henshin~! 💫 Biarkan kreativitasmu bersinar kayak transformasi magical girl~ 🌈✨",
-  "Kawaii effort is still effort, desu~ 💕👊 Teruslah berjuang, senpai!",
-  "Kalau lelah, istirahat sebentar, tapi jangan stop, ne~ 🛌🌙",
-  "Mimpi itu nggak akan mengkhianati usaha! ✍️💭 Jadi ayo gambar lagiii~!! 🐣",
-  "Bayangkan kamu di anime slice of life — tiap gambar bikin ending makin manis~ 🍱🎬",
-  "Nani!? Kamu udah sejauh ini? Sugoiii~!! Teruskan langkahmu, nakama~ 🚀🌟",
-  "Chotto matte... jangan biarkan rasa malas jadi villain-nya harimu! 😤⚔️",
-  "Satu gambar, satu langkah ke dunia impianmu~ ✨💞 Ganbareeee!",
-  "Tiap guratan tuh spell sihir loh! 🔮 Jadi gambarlah dengan cinta dan semangat uwu~ 💖",
-  "Jangan bandingin dirimu sama orang lain yaa~ Kamu itu satu-satunya karakter utama di cerita ini 💫📜",
-  "Walau lambat, kamu tetap berjalan. Dan itu luar biasa! 🐢💪",
-  "Setiap harimu itu seperti episode baru, jadi bikin yang terbaik~! 🎬🍀",
-  "Kamu nggak sendirian kok! Kami semua di party ini dukung kamu~ 🧙‍♀️🧝‍♂️⚔️",
-  "Jangan lupa senyum, biar energimu recharge kayak healing spell! 🌸😊",
-  "Kalau gagal? Ya coba lagi dong~ Itu biasa di anime! 💥💫",
-  "Bangkit dari kegagalan itu lebih keren daripada menang terus~ 😎🔥",
-  "Jangan ragu buat jadi unik! Karakter paling memorable itu yang beda! 🌈🦄",
-  "Satu langkah kecil hari ini bisa jadi awal kisah besar esok! 👣📖",
-  "Ayo kita kumpulkan EXP bareng-bareng~ ✨🎮",
-  "Kerja kerasmu hari ini = arc power-up esok hari 💪📈",
-  "Mager? Coba bayangin ada OST epic mengiringi kamu bersih-bersih 😆🎵",
-  "Ayo gambar kayak kamu sedang menyelamatkan dunia! 🎨⚡",
-  "Hujan boleh turun, tapi semangatmu harus tetap cerah~ ☔🌈",
-  "Senpai percaya kamu pasti bisa~ 💌 Jangan menyerah ne~",
-  "Gambarlah seperti kamu lagi confess ke waifu kamu~ UwU~ 💞",
-  "Kamu itu ibarat hidden gem dalam anime~ Berkilau kalau terus diasah 💎✨",
-  "Nggak perlu perfect, cukup tulus dan konsisten~ 🧸🌷",
-  "Kalau hari ini gagal, anggap aja filler episode, besok naik lagi~ 🎭📈",
-  "Jangan terlalu keras ke diri sendiri, anime MC juga kadang nangis kok~ 😭🌧️",
-  "Biar lambat asal *no skip*, prosesmu itu berharga banget! 🐌💖",
-  "Coba pikirin ini: kamu gambar hari ini bisa nyentuh hati orang lain suatu saat nanti 💌✨",
-  "Gambarlah seperti kamu sedang summon spirit animal kamu! 🐺🎨",
-  "Nggak ada garis yang sia-sia — semua itu bagian dari training arc kamu! 📖✍️",
-  "Kamu itu gabungan antara si genius dan si ulet~ Keren banget kan? 😎💥",
-  "Kalau dunia nyata berat, setidaknya dunia gambarmu bisa kamu kendalikan~ 🎨💭",
-  "Napas dulu... tarik... hembus... oke, lanjut push lagi! 😮‍💨💥",
-  "Keraguanmu cuma efek status sementara. Kamu bisa recover, percayalah~ 💫🛡️",
-  "Kamu itu kayak karakter yang bakal jadi legenda... asal terus lanjut! 🏆🌟",
-  "Hobi ini bukan cuma hobi. Ini jalan ninjamu~ 👊🔥",
-  "Hari yang berat bukan akhir dari segalanya. Kadang cuma episode sad doang 🥺💧",
-  "Waktu kamu menggambar, dunia jadi tempat yang lebih indah~ 🖌️🌍",
-  "Lelah itu wajar, tapi jangan sampai kehilangan alasan kenapa kamu mulai ✨📓",
-  "Jangan tunggu mood! Kadang kamu harus nyerang dulu kayak turn-based RPG~ 💥🎮",
-  "Kamu itu seperti bunga yang mekar perlahan, tapi pasti wangi dan indah~ 🌸🍃",
-  "Ulangi terus kayak grinding monster, nanti EXP-mu juga naik! 🧠📈",
-  "Suaramu penting, karyamu berharga, dan semangatmu... luar biasa! 🌟🎶"
+  "Ganbatte ne~! 💪✨ You got this, just like an anime MC who never gives up! 🌸",
+  "Yatta! 🎉 One more step toward your dream, keep going~ (≧◡≦) 💖",
+  "UwU~ Don't forget to have fun while drawing, okay? 🎨✨",
+  "Today is part of an important *arc* in your life~ Don’t skip it~ (｡•̀ᴗ-)✧",
+  "Ganbatte! You're the protagonist of your own story—never give up! 🌸📖",
+  "Fighto~! Your inner power is just waiting to awaken! 💥💫",
+  "Uwaah~ You're doing great already! Just like a hero in training~ 🏃‍♂️🌟",
+  "Even small steps make a journey—take your time, senpai~ 🚶‍♀️🍃",
+  "Don't be sad, your sparkle hasn't faded~ it's just charging up! ✨(╥﹏╥)",
+  "You're not alone, your nakama believe in you too! 🤝💖",
+  "Kyaa~ So cool! You're leveling up like an RPG hero! 🗡️📈",
+  "If today’s hard, tomorrow is your redemption episode~ hang in there! 🌙🎬",
+  "You're shining brighter than a thousand sakura petals~ 🌸(｡♥‿♥｡)",
+  "Keep drawing, even messy sketches are part of the magic~ ✍️💞",
+  "Nya~! Every mistake is just EXP~ you're grinding IRL! 🐾🎮",
+  "Don't worry if it's slow... even Goku needed training arcs! 💪🔥",
+  "Your smile is your ultimate weapon! Use it wisely~ 😁🌈",
+  "Take a deep breath~ You're in the calm before the climax~ 😌🎵",
+  "Never forget... your story matters, and it's worth watching till the end! 📺✨"
 ];
 
-function getRandomItem(array) {
-  return array[Math.floor(Math.random() * array.length)];
-}
 
-export default function QuestPage() {
-  const [mounted, setMounted] = useState(false);
-  const [today, setToday] = useState('');
-  const [quest, setQuest] = useState(null);
-  const [motivasi, setMotivasi] = useState('');
+export default function HashtagIdeaExplorer() {
+  const [mode, setMode] = useState('easy');
+  const [tags, setTags] = useState([]);
+  const [dailyMotivation, setDailyMotivation] = useState('');
+
+  const getRandomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+  const generateTags = () => {
+    const selected = modeRules[mode].map(category => ({
+      category,
+      label: getRandomItem(categories[category]),
+    }));
+    setTags(selected);
+  };
+
+  const shuffleTag = (index) => {
+    setTags(prev => {
+      const newTags = [...prev];
+      const category = newTags[index].category;
+      newTags[index] = {
+        category,
+        label: getRandomItem(categories[category]),
+      };
+      return newTags;
+    });
+  };
 
   useEffect(() => {
-    setMounted(true);
-    setToday(
-      new Date().toLocaleDateString('id-ID', {
-        timeZone: 'Asia/Jakarta',
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
-    );
-    setQuest(getRandomItem(tasksData));
-    setMotivasi(getRandomItem(motivasiAnimeUwu));
+    const today = new Date().toLocaleDateString();
+    const hash = [...today].reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const index = hash % motivasiAnimeUwu.length;
+    setDailyMotivation(motivasiAnimeUwu[index]);
   }, []);
 
-  if (!mounted) return null;
-
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gray-900 text-white">
       <Header />
-      <main className="flex-1 bg-gray-900 text-white flex flex-col items-center justify-center px-4 py-12">
-        <h1 className="text-3xl font-bold mb-4">🎨 Quest Ilustrasi Harian</h1>
-        <p className="text-gray-400 mb-6">{today}</p>
 
-        {quest && (
-          <div className="bg-gray-800 text-white px-6 py-4 rounded-md shadow mb-6 w-full max-w-xl">
-            <p className="text-lg">{quest.task}</p>
+      <main className="flex-1 py-10 px-4 bg-gray-900">
+        <div className="max-w-4xl mx-auto bg-gray-800 rounded-xl shadow-md border border-gray-700 p-6">
+          <h1 className="text-3xl font-bold mb-6 text-center text-white">
+            Hashtag Idea Explorer
+          </h1>
+
+          <div className="flex flex-wrap items-center justify-center gap-4 mb-6">
+            <select
+              value={mode}
+              onChange={(e) => setMode(e.target.value)}
+              className="bg-gray-700 text-white border border-gray-600 px-3 py-1 rounded"
+            >
+              <option value="easy">Easy</option>
+              <option value="normal">Normal</option>
+              <option value="hard">Hard</option>
+            </select>
+
+            <button
+              onClick={generateTags}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded"
+            >
+              Generate
+            </button>
           </div>
-        )}
 
-        <p className="text-pink-400 italic text-lg mb-6 max-w-xl">💬 {motivasi}</p>
+          <div className="flex flex-wrap gap-3 justify-center mb-10">
+            {tags.map((tag, idx) => (
+              <div
+                key={idx}
+                className="bg-gray-700 border border-gray-600 rounded px-3 py-1 flex items-center space-x-2 shadow"
+              >
+                <span className="text-white font-medium">#{tag.label}</span>
+                <button
+                  onClick={() => shuffleTag(idx)}
+                  className="text-gray-400 hover:text-white"
+                  title={`Shuffle ${tag.category}`}
+                >
+                  🔄
+                </button>
+              </div>
+            ))}
+          </div>
 
-        <button
-          onClick={() => {
-            setQuest(getRandomItem(tasksData));
-            setMotivasi(getRandomItem(motivasiAnimeUwu));
-          }}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded transition"
-        >
-          🎲 Ambil Ulang Quest
-        </button>
+          <div className="mt-10 text-center">
+            <h2 className="text-xl font-semibold text-pink-400 mb-2">✨ Daily Motivation ✨</h2>
+            <p className="text-gray-300 italic">{dailyMotivation}</p>
+          </div>
+        </div>
       </main>
+
       <Footer />
     </div>
   );

@@ -37,14 +37,26 @@ export const initialCards = [
   },
   {
     id: 7,
-    title: '💰 Nillion Wallet',
+    title: '💰 Nillion Wallet 🔐',
     category: 'live',
     href: '/nillion',
   },
   {
     id: 8,
-    title: '🧠 Gensyn Check',
+    title: '🧠 Gensyn Check ⚙️',
     category: 'live',
     href: '/gensyn',
+  },
+  {
+    id: 9,
+    title: '🧩 Shamir Secret Sharing 🔐',
+    category: 'live',
+    href: '/sss',
+  },
+  {
+    id: 10,
+    title: '🎨 Illustration Challenge ✏️',
+    category: 'live',
+    href: '/illustration-challange',
   },
 ];

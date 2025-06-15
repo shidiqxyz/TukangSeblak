@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-// Import JSON directly from project root (ensure data.json is in the src or root and configured for import)
-import dataFile from './data.json';
+import dataFile from './data.json'; // Pastikan file JSON valid
 
 export default function HashtagIdeaExplorer() {
   const [tags, setTags] = useState([]);
@@ -12,11 +11,13 @@ export default function HashtagIdeaExplorer() {
   const [dailyMotivation, setDailyMotivation] = useState('');
 
   useEffect(() => {
-    // Directly load from imported JSON
-    const { general = [], character = [] } = dataFile;
-    setDataJson({ general, character });
+    // Validasi dan parsing dari file JSON
+    if (dataFile && typeof dataFile === 'object') {
+      const { general = [], character = [] } = dataFile;
+      setDataJson({ general, character });
+    }
 
-    // Daily motivation logic
+    // Motivasi harian (acak berdasarkan tanggal)
     const motivasiAnimeUwu = [
       "Ganbatte ne~! 💪✨ You got this, just like an anime MC who never gives up! 🌸",
       "Yatta! 🎉 One more step toward your dream, keep going~ (≧◡≦) 💖",

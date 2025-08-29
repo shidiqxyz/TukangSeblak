@@ -1,5 +1,4 @@
-'use client'; // Directive untuk client-side rendering
-
+'use client';
 import { useState } from 'react';
 
 export default function LineaClient() {
@@ -8,7 +7,37 @@ export default function LineaClient() {
   const [totalLxp, setTotalLxp] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // Fungsi untuk memeriksa status melalui API
+  // LAM Tier Mapping
+  const lamTiers = [
+    { tier: 'Tier 1', value: 0.000000001491 },
+    { tier: 'Tier 2', value: 0.000000001640 },
+    { tier: 'Tier 3', value: 0.000000001789 },
+    { tier: 'Tier 4', value: 0.000000001938 },
+    { tier: 'Tier 5', value: 0.000000002461 },
+    { tier: 'Tier 6', value: 0.000000002640 },
+    { tier: 'Tier 7', value: 0.000000002684 },
+    { tier: 'Tier 8', value: 0.000000003132 },
+    { tier: 'Tier 9', value: 0.000000004474 },
+    { tier: 'Tier 10', value: 0.000000004847 },
+    { tier: 'Tier 11', value: 0.000000007605 },
+    { tier: 'Tier 12', value: 0.000000008053 },
+    { tier: 'Tier 13', value: 0.000000008547 },
+    { tier: 'Tier 14', value: 0.000000008724 },
+    { tier: 'Tier 15', value: 0.000000009209 },
+  ];
+
+  const getLamTier = (lamValue) => {
+    if (!lamValue) return '-';
+    let foundTier = '-';
+    for (let i = lamTiers.length - 1; i >= 0; i--) {
+      if (lamValue >= lamTiers[i].value) {
+        foundTier = lamTiers[i].tier;
+        break;
+      }
+    }
+    return foundTier;
+  };
+
   const checkAPI = async () => {
     const trimmedAddresses = addresses.trim();
     if (!trimmedAddresses) {
@@ -38,15 +67,21 @@ export default function LineaClient() {
         const isFlaggedClass = !lxpData.isFlagged ? 'text-green-400' : 'text-red-400';
         const mapping = { 1: 'Alpha', 2: 'Beta', 3: 'Gamma', 4: 'Delta', 5: 'Omega' };
         const checkResults = Object.entries(checkData)
-          .filter(([value]) => value)
+          .filter(([key, value]) => value === true)
           .map(([key]) => mapping[key])
           .join(', ') || '-';
         totalLxpValue += parseInt(lxpData.lxp || 0);
+
+        const lam = parseFloat(lxpData.lam || 0);
+        const lamTier = getLamTier(lam);
+
         return {
           address,
           poh: lxpData.poh,
           isFlagged: lxpData.isFlagged,
           lxp: lxpData.lxp,
+          lxpL: lxpData['lxp-l'],
+          lamTier,
           checkResults,
           pohClass,
           isFlaggedClass,
@@ -100,9 +135,9 @@ export default function LineaClient() {
             <h2 className="text-xl font-semibold text-gray-300 flex items-center">
               📋 Results <span className="ml-2 text-sm text-gray-500">(Total: {results.length})</span>
             </h2>
-            <p className="text-lg text-green-400 font-semibold flex items-center">
-              💰 Total LXP: {totalLxp} <span className="ml-2 text-sm text-gray-500">(Combined)</span>
-            </p>
+            <div className="text-right">
+              <p className="text-lg text-green-400 font-semibold">💰 Total LXP: {totalLxp}</p>
+            </div>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full bg-gray-700 rounded-lg overflow-hidden">
@@ -112,6 +147,8 @@ export default function LineaClient() {
                   <th className="py-3 px-4 text-left">✅ POH</th>
                   <th className="py-3 px-4 text-left">🚩 isFlagged</th>
                   <th className="py-3 px-4 text-left">💰 LXP</th>
+                  <th className="py-3 px-4 text-left">📊 LXP-L</th>
+                  <th className="py-3 px-4 text-left">🏷️ LAM Tier</th>
                   <th className="py-3 px-4 text-left">🌐 Linea Voyager</th>
                 </tr>
               </thead>
@@ -119,13 +156,11 @@ export default function LineaClient() {
                 {results.map((result, index) => (
                   <tr key={index} className="border-b border-gray-600">
                     <td className="py-3 px-4 text-gray-300">{result.address}</td>
-                    <td className={`py-3 px-4 ${result.pohClass}`}>
-                      {result.poh ? '✅ True' : '❌ False'}
-                    </td>
-                    <td className={`py-3 px-4 ${result.isFlaggedClass}`}>
-                      {result.isFlagged ? '❌ True' : '✅ False'}
-                    </td>
+                    <td className={`py-3 px-4 ${result.pohClass}`}>{result.poh ? '✅ True' : '❌ False'}</td>
+                    <td className={`py-3 px-4 ${result.isFlaggedClass}`}>{result.isFlagged ? '❌ True' : '✅ False'}</td>
                     <td className="py-3 px-4 text-yellow-400">💰 {result.lxp}</td>
+                    <td className="py-3 px-4 text-blue-400">📊 {result.lxpL}</td>
+                    <td className="py-3 px-4 text-cyan-400">🏷️ {result.lamTier}</td>
                     <td className="py-3 px-4 text-gray-400">{result.checkResults}</td>
                   </tr>
                 ))}

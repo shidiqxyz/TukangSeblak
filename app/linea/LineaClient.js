@@ -5,6 +5,7 @@ export default function LineaClient() {
   const [addresses, setAddresses] = useState('');
   const [results, setResults] = useState([]);
   const [totalLxp, setTotalLxp] = useState(0);
+  const [totalProbability, setTotalProbability] = useState(0);
   const [loading, setLoading] = useState(false);
 
   // LAM Tier Mapping
@@ -38,6 +39,12 @@ export default function LineaClient() {
     return foundTier;
   };
 
+  // 🔥 Fungsi untuk hitung Probability Linea
+  const calculateProbability = (lxp, lam) => {
+    if (!lxp || !lam) return 0;
+    return lxp * lam * 1_000_000_000;
+  };
+
   const checkAPI = async () => {
     const trimmedAddresses = addresses.trim();
     if (!trimmedAddresses) {
@@ -49,9 +56,12 @@ export default function LineaClient() {
       alert('❌ No valid addresses found.');
       return;
     }
+
     setLoading(true);
     setResults([]);
     setTotalLxp(0);
+    setTotalProbability(0);
+
     try {
       const promises = addressList.map(async (address) => {
         const [lxpData, checkData] = await Promise.all([
@@ -60,20 +70,28 @@ export default function LineaClient() {
         ]);
         return { address, lxpData, checkData };
       });
+
       const resultsData = await Promise.all(promises);
       let totalLxpValue = 0;
+      let totalProbabilityValue = 0;
+
       const formattedResults = resultsData.map(({ address, lxpData, checkData }) => {
         const pohClass = lxpData.poh ? 'text-green-400' : 'text-red-400';
         const isFlaggedClass = !lxpData.isFlagged ? 'text-green-400' : 'text-red-400';
         const mapping = { 1: 'Alpha', 2: 'Beta', 3: 'Gamma', 4: 'Delta', 5: 'Omega' };
+
         const checkResults = Object.entries(checkData)
           .filter(([key, value]) => value === true)
           .map(([key]) => mapping[key])
           .join(', ') || '-';
+
         totalLxpValue += parseInt(lxpData.lxp || 0);
 
         const lam = parseFloat(lxpData.lam || 0);
         const lamTier = getLamTier(lam);
+        const probability = calculateProbability(lxpData.lxp, lam);
+
+        totalProbabilityValue += probability;
 
         return {
           address,
@@ -82,13 +100,16 @@ export default function LineaClient() {
           lxp: lxpData.lxp,
           lxpL: lxpData['lxp-l'],
           lamTier,
+          probability: probability.toFixed(2),
           checkResults,
           pohClass,
           isFlaggedClass,
         };
       });
+
       setResults(formattedResults);
       setTotalLxp(totalLxpValue);
+      setTotalProbability(totalProbabilityValue);
     } catch (error) {
       console.error('🚨 Error fetching API:', error);
       alert('❌ Error fetching API data. Please try again later.');
@@ -137,6 +158,7 @@ export default function LineaClient() {
             </h2>
             <div className="text-right">
               <p className="text-lg text-green-400 font-semibold">💰 Total LXP: {totalLxp}</p>
+              <p className="text-lg text-purple-400 font-semibold">🎲 Total Probability: {totalProbability.toFixed(2)}</p>
             </div>
           </div>
           <div className="overflow-x-auto">
@@ -149,6 +171,7 @@ export default function LineaClient() {
                   <th className="py-3 px-4 text-left">💰 LXP</th>
                   <th className="py-3 px-4 text-left">📊 LXP-L</th>
                   <th className="py-3 px-4 text-left">🏷️ LAM Tier</th>
+                  <th className="py-3 px-4 text-left">🎲 Probability Linea</th>
                   <th className="py-3 px-4 text-left">🌐 Linea Voyager</th>
                 </tr>
               </thead>
@@ -161,6 +184,7 @@ export default function LineaClient() {
                     <td className="py-3 px-4 text-yellow-400">💰 {result.lxp}</td>
                     <td className="py-3 px-4 text-blue-400">📊 {result.lxpL}</td>
                     <td className="py-3 px-4 text-cyan-400">🏷️ {result.lamTier}</td>
+                    <td className="py-3 px-4 text-purple-400">🎲 {result.probability}</td>
                     <td className="py-3 px-4 text-gray-400">{result.checkResults}</td>
                   </tr>
                 ))}

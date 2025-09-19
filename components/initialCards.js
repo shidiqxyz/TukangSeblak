@@ -59,4 +59,10 @@ export const initialCards = [
     category: 'live',
     href: '/illustration-challange',
   },
+  {
+    id: 11,
+    title: 'Base Learn',
+    category: 'live',
+    href: '/base-learn',
+  },
 ];

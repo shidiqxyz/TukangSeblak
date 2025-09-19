@@ -3,17 +3,28 @@
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 
+// ABI untuk mengecek kepemilikan NFT
 const nftAbi = [
   "function balanceOf(address owner) view returns (uint256)"
 ];
 
+// ABI untuk kontrak minting, sekarang termasuk fungsi verifikasi
 const mintAbi = [
-  "function mint(address _submissionAddress) public returns (uint256)"
+  // Fungsi verifikasi/prasyarat
+  "function testContract(address _submissionAddress) public", 
+
+  // Fungsi-fungsi minting yang mungkin ada
+  "function mint(address _submissionAddress) public returns (uint256)",
+  "function mintTo(address _to, address _submissionAddress) public returns (uint256)",
+  "function safeMint(address _to, address _submissionAddress) public returns (uint256)",
+  "function claim(address _submissionAddress) public returns (uint256)",
+  "function mintWithSubmission(address _submissionAddress) public returns (uint256)"
 ];
 
+// Konfigurasi Jaringan Base Sepolia
 const BASE_SEPOLIA_CHAIN_ID = 84532;
 const BASE_SEPOLIA_NETWORK = {
-  chainId: '0x14a34', // 84532 in hex
+  chainId: '0x14a34', // 84532 dalam hex
   chainName: 'Base Sepolia',
   rpcUrls: ['https://sepolia.base.org'],
   nativeCurrency: {
@@ -24,6 +35,7 @@ const BASE_SEPOLIA_NETWORK = {
   blockExplorerUrls: ['https://sepolia-explorer.base.org']
 };
 
+// Data untuk role dan requirement NFT
 const roles = [
   {
     name: "Newcomer",
@@ -80,13 +92,12 @@ export default function BaseLearn() {
   const [balances, setBalances] = useState({});
   const [submissionInputs, setSubmissionInputs] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [isMinting, setIsMinting] = useState({});
+  const [mintingStatus, setMintingStatus] = useState({}); // State untuk melacak proses: 'idle', 'verifying', 'minting'
   const [currentNetwork, setCurrentNetwork] = useState(null);
   const [isCorrectNetwork, setIsCorrectNetwork] = useState(false);
 
   const checkNetwork = async () => {
     if (!window.ethereum) return;
-    
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const network = await provider.getNetwork();
@@ -101,15 +112,12 @@ export default function BaseLearn() {
 
   const switchToBaseSepolia = async () => {
     if (!window.ethereum) return;
-
     try {
-      // Try to switch to Base Sepolia
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: BASE_SEPOLIA_NETWORK.chainId }],
       });
     } catch (switchError) {
-      // If the chain doesn't exist, add it
       if (switchError.code === 4902) {
         try {
           await window.ethereum.request({
@@ -133,27 +141,14 @@ export default function BaseLearn() {
         alert("Please install MetaMask or another Web3 wallet");
         return;
       }
-
       setIsLoading(true);
-      
-      // Check and switch to correct network first
       const network = await checkNetwork();
       if (network && network.chainId !== BASE_SEPOLIA_CHAIN_ID) {
-        const shouldSwitch = confirm(
-          `You're connected to ${network.name || 'Unknown Network'}. ` +
-          `This app requires Base Sepolia testnet. Would you like to switch networks?`
-        );
-        
-        if (shouldSwitch) {
+        if (confirm(`You're on ${network.name}. This app requires Base Sepolia. Switch networks?`)) {
           await switchToBaseSepolia();
-          await checkNetwork(); // Re-check after switching
         }
       }
-      
-      const accounts = await window.ethereum.request({ 
-        method: "eth_requestAccounts" 
-      });
-      
+      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
       if (accounts.length > 0) {
         setAccount(accounts[0]);
       }
@@ -167,158 +162,80 @@ export default function BaseLearn() {
 
   const fetchBalances = async () => {
     if (!account || !window.ethereum) return;
-
     try {
       setIsLoading(true);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      
-      // Check network
       const network = await provider.getNetwork();
-      console.log("Current network:", network.name, "Chain ID:", network.chainId);
-      
       if (network.chainId !== BASE_SEPOLIA_CHAIN_ID) {
-        alert(`Wrong network! Please switch to Base Sepolia (Chain ID: ${BASE_SEPOLIA_CHAIN_ID}). Currently on Chain ID: ${network.chainId}`);
         setIsCorrectNetwork(false);
         return;
       }
-      
       setIsCorrectNetwork(true);
-
       const results = {};
-      
       for (const role of roles) {
         for (const req of role.requirements) {
           try {
-            // Validate address format first
             if (!ethers.utils.isAddress(req.address)) {
               console.error(`Invalid address format: ${req.address}`);
               results[req.address] = 0;
               continue;
             }
-
             const contract = new ethers.Contract(req.address, nftAbi, provider);
-            
-            // Check if contract exists by getting code
-            const code = await provider.getCode(req.address);
-            if (code === "0x") {
-              console.warn(`No contract found at address ${req.address} on Base Sepolia`);
-              results[req.address] = 0;
-              continue;
-            }
-
             const balance = await contract.balanceOf(account);
             results[req.address] = balance.toNumber();
-            console.log(`Balance for ${req.label}: ${results[req.address]}`);
           } catch (err) {
-            console.error(`Error reading balance from ${req.address} (${req.label}):`, err.message);
+            console.error(`Error reading balance from ${req.address}:`, err.message);
             results[req.address] = 0;
           }
         }
       }
-      
       setBalances(results);
     } catch (error) {
       console.error("Error fetching balances:", error);
-      
-      // More specific error messages
-      if (error.message.includes("network")) {
-        alert("Network error. Please check your connection and try again.");
-      } else if (error.message.includes("rejected")) {
-        alert("Request was rejected. Please try connecting your wallet again.");
-      } else {
-        alert("Failed to fetch balances. Please make sure you're on Base Sepolia network.");
-      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const mintNFT = async (submissionAddress, requirementAddress) => {
-    if (!account || !submissionAddress.trim()) {
-      alert("Please enter a submission address!");
+  const handleVerifyAndMint = async (submissionAddress, requirementAddress) => {
+    if (!account || !submissionAddress.trim() || !ethers.utils.isAddress(submissionAddress)) {
+      alert("Please enter a valid submission address!");
       return;
     }
 
-    if (!ethers.utils.isAddress(submissionAddress)) {
-      alert("Please enter a valid Ethereum address!");
-      return;
-    }
+    setMintingStatus(prev => ({ ...prev, [requirementAddress]: 'verifying' }));
 
     try {
-      setIsMinting(prev => ({ ...prev, [requirementAddress]: true }));
-      
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
-      
-      // Check network
-      const network = await provider.getNetwork();
-      console.log("Minting on network:", network.name, "Chain ID:", network.chainId);
-      
-      if (network.chainId !== BASE_SEPOLIA_CHAIN_ID) {
-        throw new Error(`Please switch to Base Sepolia network. Currently on Chain ID: ${network.chainId}`);
-      }
-      
-      // Validate mint contract address
-      if (!ethers.utils.isAddress(mintContractAddress)) {
-        throw new Error("Invalid mint contract address");
-      }
+      const mintContract = new ethers.Contract(requirementAddress, mintAbi, signer);
 
-      // Check if mint contract exists
-      const code = await provider.getCode(mintContractAddress);
-      if (code === "0x") {
-        throw new Error(`Mint contract not found at ${mintContractAddress} on ${network.name}. Please check you're on the correct network.`);
-      }
-
-      const mintContract = new ethers.Contract(mintContractAddress, mintAbi, signer);
-      
-      // Estimate gas first to catch errors early
+      // --- TAHAP 1: VERIFIKASI DENGAN testContract ---
+      console.log(`[1/2] Verifying submission with testContract...`);
       try {
-        const gasEstimate = await mintContract.estimateGas.mint(submissionAddress);
-        console.log("Estimated gas:", gasEstimate.toString());
-      } catch (gasError) {
-        console.error("Gas estimation failed:", gasError);
-        throw new Error("Transaction will likely fail. Please check the submission address and try again.");
+        const verifyTx = await mintContract.testContract(submissionAddress);
+        const verifyReceipt = await verifyTx.wait(); // Tunggu transaksi verifikasi selesai
+        if(verifyReceipt.status === 0){
+          throw new Error("Verification transaction failed. Check your submission contract.");
+        }
+        console.log(`[1/2] Verification successful! Tx: ${verifyTx.hash}`);
+      } catch (error) {
+        const reason = error.reason || "Check console for details.";
+        throw new Error(`Contract verification failed: ${reason}`);
       }
       
-      const tx = await mintContract.mint(submissionAddress);
-      console.log("Transaction sent:", tx.hash);
-      
-      const receipt = await tx.wait();
-      
-      if (receipt.status === 1) {
-        alert("NFT minted successfully! 🎉");
-        setSubmissionInputs(prev => ({ 
-          ...prev, 
-          [requirementAddress]: "" 
-        }));
-        await fetchBalances();
-      } else {
-        throw new Error("Transaction failed");
-      }
+      await fetchBalances();
+
     } catch (error) {
-      console.error("Mint error:", error);
-      
-      if (error.code === "ACTION_REJECTED" || error.code === 4001) {
-        alert("Transaction was rejected by user");
-      } else if (error.message.includes("insufficient funds")) {
-        alert("Insufficient funds for gas fees");
-      } else if (error.message.includes("contract not found")) {
-        alert(error.message);
-      } else if (error.message.includes("network")) {
-        alert("Network error. Please check your connection and network settings.");
-      } else {
-        alert("Mint failed: " + (error.reason || error.message));
-      }
+      console.error("Full Process Error:", error);
+      alert("Process failed: " + error.message);
     } finally {
-      setIsMinting(prev => ({ ...prev, [requirementAddress]: false }));
+      setMintingStatus(prev => ({ ...prev, [requirementAddress]: 'idle' }));
     }
   };
 
   const handleInputChange = (requirementAddress, value) => {
-    setSubmissionInputs(prev => ({
-      ...prev,
-      [requirementAddress]: value
-    }));
+    setSubmissionInputs(prev => ({ ...prev, [requirementAddress]: value }));
   };
 
   const calculateRoleProgress = (role) => {
@@ -330,53 +247,30 @@ export default function BaseLearn() {
     const checkConnection = async () => {
       if (window.ethereum) {
         try {
-          const accounts = await window.ethereum.request({ 
-            method: "eth_accounts" 
-          });
-          if (accounts.length > 0) {
-            setAccount(accounts[0]);
-          }
-          
-          // Check network on load
+          const accounts = await window.ethereum.request({ method: "eth_accounts" });
+          if (accounts.length > 0) setAccount(accounts[0]);
           await checkNetwork();
         } catch (error) {
-          console.error("Error checking wallet connection:", error);
+          console.error("Error checking initial wallet connection:", error);
         }
       }
     };
-
     checkConnection();
   }, []);
 
   useEffect(() => {
-    if (account) {
-      fetchBalances();
-    }
-  }, [account]);
+    if (account) fetchBalances();
+  }, [account, isCorrectNetwork]);
 
   useEffect(() => {
     if (window.ethereum) {
-      const handleAccountsChanged = (accounts) => {
-        if (accounts.length > 0) {
-          setAccount(accounts[0]);
-        } else {
-          setAccount(null);
-          setBalances({});
-        }
-      };
-
-      const handleChainChanged = (chainId) => {
-        console.log("Chain changed to:", parseInt(chainId, 16));
+      const handleAccountsChanged = (accounts) => setAccount(accounts.length > 0 ? accounts[0] : null);
+      const handleChainChanged = () => {
         checkNetwork();
-        // Reload balances if we have an account
-        if (account) {
-          setTimeout(fetchBalances, 1000); // Small delay to ensure network switch is complete
-        }
+        fetchBalances();
       };
-
       window.ethereum.on("accountsChanged", handleAccountsChanged);
       window.ethereum.on("chainChanged", handleChainChanged);
-
       return () => {
         window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
         window.ethereum.removeListener("chainChanged", handleChainChanged);
@@ -385,191 +279,119 @@ export default function BaseLearn() {
   }, [account]);
 
   return (
-  <div className="min-h-screen bg-gray-900 text-white">
-    {/* Container Utama */}
-    <div className="relative z-10 max-w-6xl mx-auto px-4 py-8">
-      
-      {/* Header */}
-      <div className="text-center mb-12">
-        <h1 className="text-5xl font-bold tracking-wide text-white mb-4">
-          Base Learn Roles
-        </h1>
-        <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-          Complete challenges and mint NFT badges to progress through the Base learning hierarchy
-        </p>
-      </div>
+    <div className="min-h-screen bg-gray-900 text-white">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 py-8">
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold tracking-wide text-white mb-4">Base Learn Roles</h1>
+          <p className="text-lg text-gray-300 max-w-2xl mx-auto">Complete challenges and mint NFT badges to progress through the Base learning hierarchy</p>
+        </div>
 
-      {/* Wallet Connection */}
-      <div className="text-center mb-12">
-        {!account ? (
-          <button 
-            onClick={connectWallet}
-            disabled={isLoading}
-            className="group relative px-8 py-4 bg-emerald-600 text-white font-semibold rounded-xl transition-all duration-300 hover:bg-emerald-700 hover:scale-105 hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-6 h-6 border-2 border-white rounded border-t-transparent animate-spin hidden group-disabled:block"></div>
+        <div className="text-center mb-12">
+          {!account ? (
+            <button onClick={connectWallet} disabled={isLoading} className="group relative px-8 py-4 bg-emerald-600 text-white font-semibold rounded-xl transition-all duration-300 hover:bg-emerald-700 hover:scale-105 hover:shadow-2xl disabled:opacity-50">
               {isLoading ? "Connecting..." : "Connect Wallet"}
-              {!isLoading && <span className="text-xl">🔗</span>}
-            </div>
-          </button>
-        ) : (
-          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 max-w-md mx-auto">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-green-400 font-medium">Wallet Connected</span>
-            </div>
-            <p className="text-gray-300 font-mono text-sm break-all mb-4">
-              {account}
-            </p>
-            <button 
-              onClick={fetchBalances}
-              disabled={isLoading}
-              className="w-full px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {isLoading && <div className="w-4 h-4 border-2 border-white rounded border-t-transparent animate-spin"></div>}
-              {isLoading ? "Refreshing..." : "🔄 Refresh Balances"}
             </button>
-          </div>
-        )}
-      </div>
-
-      {/* Network Info */}
-      {account && (
-        <div className="text-center mb-8">
-          {isCorrectNetwork ? (
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-lg text-green-300 text-sm">
-              <span>✅</span>
-              <span>Connected to Base Sepolia Testnet</span>
-              {currentNetwork && (
-                <span className="text-xs opacity-75">(Chain ID: {currentNetwork.chainId})</span>
-              )}
-            </div>
           ) : (
-            <div className="space-y-3">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-red-300 text-sm">
-                <span>⚠️</span>
-                <span>Wrong Network! Please switch to Base Sepolia</span>
-                {currentNetwork && (
-                  <span className="text-xs opacity-75">(Currently: Chain ID {currentNetwork.chainId})</span>
-                )}
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 max-w-md mx-auto">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-green-400 font-medium">Wallet Connected</span>
               </div>
-              <button
-                onClick={switchToBaseSepolia}
-                className="px-4 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-all duration-200"
-              >
-                🔄 Switch to Base Sepolia
+              <p className="text-gray-300 font-mono text-sm break-all mb-4">{account}</p>
+              <button onClick={fetchBalances} disabled={isLoading} className="w-full px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2">
+                {isLoading && <div className="w-4 h-4 border-2 border-white rounded border-t-transparent animate-spin"></div>}
+                {isLoading ? "Refreshing..." : "🔄 Refresh Balances"}
               </button>
             </div>
           )}
         </div>
-      )}
 
-      {/* Roles Grid */}
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {roles.map((role, idx) => {
-          const progress = calculateRoleProgress(role);
-          const isComplete = progress === 100;
-
-          return (
-            <div 
-              key={idx} 
-              className="group relative bg-gray-800 border border-gray-700 rounded-2xl p-6 transition-all duration-500 hover:border-gray-600 hover:bg-gray-700 hover:scale-105 hover:shadow-2xl"
-            >
-              {/* Role Header */}
-              <div className="text-center mb-6">
-                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-600 mb-4 text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                  {role.icon}
-                </div>
-                <h2 className="text-2xl font-bold text-white mb-2">
-                  {role.name}
-                </h2>
-
-                {/* Progress Bar */}
-                <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
-                  <div 
-                    className="h-2 rounded-full bg-emerald-500 transition-all duration-700"
-                    style={{ width: `${progress}%` }}
-                  ></div>
-                </div>
-                <p className="text-sm text-gray-400">
-                  {Math.round(progress)}% Complete ({role.requirements.filter(req => balances[req.address] > 0).length}/{role.requirements.length})
-                </p>
+        {account && (
+          <div className="text-center mb-8">
+            {isCorrectNetwork ? (
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-lg text-green-300 text-sm">
+                <span>✅</span> Connected to Base Sepolia Testnet
               </div>
+            ) : (
+              <div className="flex flex-col items-center gap-2">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-red-300 text-sm">
+                  <span>⚠️</span> Wrong Network! Please switch to Base Sepolia
+                </div>
+                <button onClick={switchToBaseSepolia} className="px-4 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-all duration-200">
+                  🔄 Switch to Base Sepolia
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
-              {/* Requirements */}
-              <div className="space-y-4">
-                {role.requirements.map((req, i) => {
-                  const hasNFT = balances[req.address] > 0;
-                  const isCurrentlyMinting = isMinting[req.address];
-                  
-                  return (
-                    <div 
-                      key={i}
-                      className={`p-4 rounded-xl border transition-all duration-300 ${
-                        hasNFT 
-                          ? 'bg-emerald-500/10 border-emerald-500/30 shadow-emerald-500/20 shadow-lg' 
-                          : 'bg-gray-700 border-gray-600'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-medium text-white text-sm">
-                          {req.label}
-                        </h3>
-                        <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          hasNFT 
-                            ? 'bg-emerald-500 text-white' 
-                            : 'bg-gray-600 text-gray-300'
-                        }`}>
-                          {hasNFT ? '✅ Owned' : '❌ Missing'}
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {roles.map((role) => {
+            const progress = calculateRoleProgress(role);
+            const isComplete = progress === 100;
+            return (
+              <div key={role.name} className="group relative bg-gray-800 border border-gray-700 rounded-2xl p-6 transition-all duration-500 hover:border-gray-600 hover:bg-gray-700 hover:scale-105">
+                <div className="text-center mb-6">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-600 mb-4 text-2xl shadow-lg">{role.icon}</div>
+                  <h2 className="text-2xl font-bold text-white mb-2">{role.name}</h2>
+                  <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
+                    <div className="h-2 rounded-full bg-emerald-500" style={{ width: `${progress}%` }}></div>
+                  </div>
+                  <p className="text-sm text-gray-400">{Math.round(progress)}% Complete</p>
+                </div>
+
+                <div className="space-y-4">
+                  {role.requirements.map((req) => {
+                    const hasNFT = balances[req.address] > 0;
+                    const status = mintingStatus[req.address] || 'idle';
+                    const isProcessing = status === 'verifying' || status === 'minting';
+
+                    const getButtonText = () => {
+                      if (status === 'verifying') return "Verifying...";
+                      if (status === 'minting') return "Minting...";
+                      return "🎯 Verify & Mint";
+                    };
+
+                    return (
+                      <div key={req.address} className={`p-4 rounded-xl border ${hasNFT ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-gray-700 border-gray-600'}`}>
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="font-medium text-white text-sm">{req.label}</h3>
+                          <div className={`px-3 py-1 rounded-full text-xs font-medium ${hasNFT ? 'bg-emerald-500 text-white' : 'bg-gray-600 text-gray-300'}`}>
+                            {hasNFT ? '✅ Owned' : '❌ Missing'}
+                          </div>
                         </div>
+                        <p className="text-xs text-gray-400 font-mono break-all mb-3">Contract: {req.address}</p>
+
+                        {!hasNFT && account && isCorrectNetwork && (
+                          <div className="space-y-3">
+                            <input
+                              type="text"
+                              placeholder="Enter submission address (0x...)"
+                              value={submissionInputs[req.address] || ""}
+                              onChange={(e) => handleInputChange(req.address, e.target.value)}
+                              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white text-sm placeholder-gray-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                              disabled={isProcessing}
+                            />
+                            <button
+                              onClick={() => handleVerifyAndMint(submissionInputs[req.address], req.address)}
+                              disabled={isProcessing || !submissionInputs[req.address]?.trim()}
+                              className="w-full px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
+                            >
+                              {isProcessing && <div className="w-4 h-4 border-2 border-white rounded border-t-transparent animate-spin"></div>}
+                              {getButtonText()}
+                            </button>
+                          </div>
+                        )}
                       </div>
-
-                      {!hasNFT && account && (
-                        <div className="space-y-3">
-                          <input
-                            type="text"
-                            placeholder="Enter submission address (0x...)"
-                            value={submissionInputs[req.address] || ""}
-                            onChange={(e) => handleInputChange(req.address, e.target.value)}
-                            className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white text-sm placeholder-gray-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-colors"
-                            disabled={isCurrentlyMinting}
-                          />
-                          <button 
-                            onClick={() => mintNFT(submissionInputs[req.address], req.address)}
-                            disabled={isCurrentlyMinting || !submissionInputs[req.address]?.trim()}
-                            className="w-full px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                          >
-                            {isCurrentlyMinting && (
-                              <div className="w-4 h-4 border-2 border-white rounded border-t-transparent animate-spin"></div>
-                            )}
-                            {isCurrentlyMinting ? "Minting..." : "🎯 Mint NFT"}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-
-              {isComplete && (
-                <div className="absolute -top-2 -right-2 bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse">
-                  COMPLETE! 🏆
+                    );
+                  })}
                 </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Footer */}
-      <div className="text-center mt-16 text-gray-400">
-        <p className="text-sm">
-          Complete all challenges to unlock the next role in your Base learning journey
-        </p>
+                 {isComplete && <div className="absolute -top-2 -right-2 bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse">COMPLETE! 🏆</div>}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
-  </div>
-);
-
+  );
 }

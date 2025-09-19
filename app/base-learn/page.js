@@ -5,7 +5,7 @@ import Footer from '../../components/Footer';
 
 export const metadata = {
     title: "Base Learn - TukangSeblak",
-    description: "Calculate your APR and APY returns easily with this tool. Perfect for crypto and investment enthusiasts!",
+    description: "",
   };
 
 export default function Page() {

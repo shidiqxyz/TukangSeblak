@@ -2,7 +2,7 @@ export const initialCards = [
   {
     id: 1,
     title: '📊 Linea POH & LXP 📈',
-    category: 'live',
+    category: 'end',
     href: '/linea',
   },
   {
@@ -20,7 +20,7 @@ export const initialCards = [
   {
     id: 4,
     title: '🔗 Resolv Points Checker 🧾',
-    category: 'live',
+    category: 'end',
     href: '/resolv',
   },
   {
@@ -38,13 +38,13 @@ export const initialCards = [
   {
     id: 7,
     title: '💰 Nillion Wallet 🔐',
-    category: 'live',
+    category: 'end',
     href: '/nillion',
   },
   {
     id: 8,
     title: '🧠 Gensyn Check ⚙️',
-    category: 'live',
+    category: 'end',
     href: '/gensyn',
   },
   {

@@ -7,7 +7,7 @@ import { initialCards } from './initialCards'; // Impor data awal card
 export default function Content() {
   // State untuk search query dan kategori terpilih
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('live');
 
   // Fungsi untuk memfilter card
   const filteredCards = initialCards.filter((card) => {
@@ -20,50 +20,47 @@ export default function Content() {
   });
 
   return (
-    <div className="container mx-auto bg-gray-800 rounded-lg shadow-lg p-6 mt-8">
+    <div className="container mx-auto bg-neutral-900 border border-neutral-800 rounded-lg p-6 mt-8">
       {/* Search Bar */}
       <div className="mb-8">
         <input
           type="text"
-          placeholder="Search airdrop... 🔍"
+          placeholder="Search tools..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full p-4 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 bg-gray-700 text-white placeholder-gray-400 transition-all duration-300"
+          className="w-full p-4 border border-neutral-700 rounded-lg focus:outline-none focus:border-white bg-black text-white placeholder-neutral-500 transition-all duration-300"
         />
       </div>
 
-      {/* Categories */}
+      {/* Categories - Order: Live, End, All */}
       <div className="mb-8">
         <div className="flex space-x-4">
           <button
-            onClick={() => setSelectedCategory('all')}
-            className={`px-6 py-3 rounded-lg transition-all duration-300 ${
-              selectedCategory === 'all'
-                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }`}
-          >
-            All
-          </button>
-          <button
             onClick={() => setSelectedCategory('live')}
-            className={`px-6 py-3 rounded-lg transition-all duration-300 ${
-              selectedCategory === 'live'
-                ? 'bg-gradient-to-r from-green-500 to-green-600 text-white'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }`}
+            className={`px-6 py-3 rounded-lg transition-all duration-300 border ${selectedCategory === 'live'
+                ? 'bg-white text-black border-white'
+                : 'bg-transparent text-neutral-400 border-neutral-700 hover:border-neutral-500 hover:text-white'
+              }`}
           >
-            Live 🟢
+            Live
           </button>
           <button
             onClick={() => setSelectedCategory('end')}
-            className={`px-6 py-3 rounded-lg transition-all duration-300 ${
-              selectedCategory === 'end'
-                ? 'bg-gradient-to-r from-red-500 to-red-600 text-white'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }`}
+            className={`px-6 py-3 rounded-lg transition-all duration-300 border ${selectedCategory === 'end'
+                ? 'bg-white text-black border-white'
+                : 'bg-transparent text-neutral-400 border-neutral-700 hover:border-neutral-500 hover:text-white'
+              }`}
           >
-            End 🔴
+            End
+          </button>
+          <button
+            onClick={() => setSelectedCategory('all')}
+            className={`px-6 py-3 rounded-lg transition-all duration-300 border ${selectedCategory === 'all'
+                ? 'bg-white text-black border-white'
+                : 'bg-transparent text-neutral-400 border-neutral-700 hover:border-neutral-500 hover:text-white'
+              }`}
+          >
+            All
           </button>
         </div>
       </div>
@@ -79,8 +76,8 @@ export default function Content() {
             />
           ))
         ) : (
-          <p className="col-span-full text-center text-gray-400">
-            No cards found. 😔
+          <p className="col-span-full text-center text-neutral-500">
+            No tools found.
           </p>
         )}
       </div>

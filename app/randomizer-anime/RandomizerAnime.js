@@ -50,18 +50,17 @@ export default function RandomAnime() {
       const data = await response.json();
       const randomAnime = data.data;
 
-      // Improved NSFW check using rating field
       const isNSFW = ['Rx - Hentai', 'R+ - Mild Nudity'].includes(randomAnime.rating);
-      
+
       if (isNSFW && !nsfwEnabled) {
-        alert('⚠️ NSFW content detected. Enable NSFW filter to view.');
+        alert('NSFW content detected. Enable NSFW filter to view.');
         return;
       }
 
       setAnime(randomAnime);
       updatePreviousAnimes(randomAnime);
     } catch (error) {
-      console.error('❌ Error fetching anime:', error);
+      console.error('Error fetching anime:', error);
     }
   };
 
@@ -73,7 +72,7 @@ export default function RandomAnime() {
 
   const handleSaveAnime = () => {
     if (!anime || savedAnimes.some(saved => saved.mal_id === anime.mal_id)) {
-      alert('⭐️ Anime already saved!');
+      alert('Anime already saved!');
       return;
     }
 
@@ -99,7 +98,7 @@ export default function RandomAnime() {
       const newCount = prev + 1;
       if (newCount >= 10) {
         setShowNsfwButton(true);
-        alert('🎉 Secret NSFW button unlocked!');
+        alert('Secret NSFW button unlocked!');
       }
       return newCount;
     });
@@ -108,7 +107,7 @@ export default function RandomAnime() {
   const toggleNsfw = () => {
     setNsfwEnabled(prev => {
       const newState = !prev;
-      alert(newState ? '⚠️ NSFW enabled' : '🔒 NSFW disabled');
+      alert(newState ? 'NSFW enabled' : 'NSFW disabled');
       return newState;
     });
   };
@@ -124,63 +123,60 @@ export default function RandomAnime() {
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-900 text-white">
+    <div className="min-h-screen flex flex-col bg-black text-white">
       <Header />
 
       <main className="flex-1 container mx-auto p-4 grid grid-cols-1 md:grid-cols-[70%_30%] gap-6">
         <div className="space-y-6">
           <h1
-            className="text-3xl font-bold text-center md:text-left my-6 cursor-pointer hover:text-pink-500 transition"
+            className="text-3xl font-bold text-center md:text-left my-6 cursor-pointer hover:text-neutral-400 transition"
             onClick={handleHeaderClick}
           >
-            🎲 Random Anime Picker 🎲
+            Random Anime Picker
           </h1>
 
           {showNsfwButton && (
             <button
-              className={`mb-4 block mx-auto md:mx-0 px-4 py-2 rounded-full transition 
-                ${nsfwEnabled ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-600 hover:bg-gray-700'}`}
+              className={`mb-4 block mx-auto md:mx-0 px-4 py-2 rounded-lg border transition ${nsfwEnabled ? 'bg-white text-black border-white' : 'border-neutral-700 hover:border-white'
+                }`}
               onClick={toggleNsfw}
             >
-              {nsfwEnabled ? '⚠️ NSFW Enabled' : '🔒 NSFW Disabled'}
+              {nsfwEnabled ? 'NSFW Enabled' : 'NSFW Disabled'}
             </button>
           )}
 
           <button
-            className="bg-gradient-to-r from-purple-500 to-pink-500 
-                      hover:from-purple-600 hover:to-pink-600 
-                      w-full py-3 px-6 rounded-lg text-lg font-bold transition mb-4"
+            className="w-full py-3 px-6 rounded-lg text-lg font-medium border border-neutral-700 transition hover:bg-white hover:text-black hover:border-white mb-4"
             onClick={getRandomAnime}
           >
-            🎲 Get Random Anime
+            Get Random Anime
           </button>
 
           {anime && (
-            <div className="anime-card bg-gray-800 rounded-lg p-4 shadow-lg grid grid-cols-1 md:grid-cols-[30%_70%] gap-4">
+            <div className="anime-card bg-neutral-900 border border-neutral-800 rounded-lg p-4 grid grid-cols-1 md:grid-cols-[30%_70%] gap-4">
               <div className="relative rounded-lg overflow-hidden">
                 <img
                   src={anime.images.jpg.large_image_url}
                   alt={anime.title}
-                  className="w-full h-128 object-cover"
+                  className="w-full h-64 object-cover"
                 />
               </div>
               <div className="space-y-4">
-                <h2 className="text-xl font-bold">{anime.title}</h2>
-                <p className="text-gray-300 line-clamp-3">{anime.synopsis || 'No synopsis available'}</p>
+                <h2 className="text-xl font-bold text-white">{anime.title}</h2>
+                <p className="text-neutral-400 line-clamp-3">{anime.synopsis || 'No synopsis available'}</p>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>🎭 {anime.genres.map(g => g.name).join(', ')}</div>
-                  <div>⭐️ {anime.score || 'N/A'}</div>
-                  <div>🎞️ {anime.episodes || 'N/A'} eps</div>
-                  <div>⏳ {anime.status}</div>
+                <div className="grid grid-cols-2 gap-4 text-neutral-400">
+                  <div>Genre: {anime.genres.map(g => g.name).join(', ')}</div>
+                  <div>Score: {anime.score || 'N/A'}</div>
+                  <div>Episodes: {anime.episodes || 'N/A'}</div>
+                  <div>Status: {anime.status}</div>
                 </div>
 
                 <button
-                  className="bg-green-500 hover:bg-green-600 
-                            text-white px-4 py-2 rounded transition w-max"
+                  className="border border-neutral-700 text-white px-4 py-2 rounded-lg transition hover:bg-white hover:text-black hover:border-white"
                   onClick={handleSaveAnime}
                 >
-                  💾 Save Anime
+                  Save Anime
                 </button>
               </div>
             </div>
@@ -188,23 +184,23 @@ export default function RandomAnime() {
         </div>
 
         <div className="space-y-10">
-          <div className="bg-gray-800 rounded-lg p-4 overflow-hidden">
-            <h3 className="text-lg font-bold mb-4">📜 Previously Viewed</h3>
+          <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-hidden">
+            <h3 className="text-lg font-bold mb-4 text-white">Previously Viewed</h3>
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {paginatedPrevious.length > 0 ? (
                 paginatedPrevious.map((anime) => (
-                  <div key={anime.mal_id} className="bg-gray-700 p-2 rounded flex justify-between items-center">
-                    <span className="truncate">📺 {anime.title}</span>
+                  <div key={anime.mal_id} className="bg-black border border-neutral-800 p-2 rounded flex justify-between items-center">
+                    <span className="truncate text-neutral-400">{anime.title}</span>
                     <button
-                      className="text-red-500 hover:text-red-700 ml-2"
+                      className="text-neutral-500 hover:text-white ml-2"
                       onClick={() => handleRemovePrevious(anime.mal_id)}
                     >
-                      🗑️
+                      X
                     </button>
                   </div>
                 ))
               ) : (
-                <p>No previous animes</p>
+                <p className="text-neutral-500">No previous animes</p>
               )}
             </div>
             <Pagination
@@ -214,23 +210,23 @@ export default function RandomAnime() {
             />
           </div>
 
-          <div className="bg-gray-800 rounded-lg p-4 overflow-hidden">
-            <h3 className="text-lg font-bold mb-4">⭐️ Saved Anime</h3>
+          <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-hidden">
+            <h3 className="text-lg font-bold mb-4 text-white">Saved Anime</h3>
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {paginatedSaved.length > 0 ? (
                 paginatedSaved.map((anime) => (
-                  <div key={anime.mal_id} className="bg-gray-700 p-2 rounded flex justify-between items-center">
-                    <span className="truncate">📺 {anime.title}</span>
+                  <div key={anime.mal_id} className="bg-black border border-neutral-800 p-2 rounded flex justify-between items-center">
+                    <span className="truncate text-neutral-400">{anime.title}</span>
                     <button
-                      className="text-red-500 hover:text-red-700 ml-2"
+                      className="text-neutral-500 hover:text-white ml-2"
                       onClick={() => handleRemoveSaved(anime.mal_id)}
                     >
-                      🗑️
+                      X
                     </button>
                   </div>
                 ))
               ) : (
-                <p>No saved animes</p>
+                <p className="text-neutral-500">No saved animes</p>
               )}
             </div>
             <Pagination
@@ -250,21 +246,21 @@ export default function RandomAnime() {
 const Pagination = ({ currentPage, totalPages, onPageChange }) => (
   <div className="flex justify-between items-center mt-4">
     <button
-      className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded disabled:opacity-50"
+      className="border border-neutral-700 text-white px-3 py-1 rounded disabled:opacity-50 hover:border-white transition"
       onClick={() => onPageChange(currentPage - 1)}
       disabled={currentPage === 1}
     >
-      ⬅️ Previous
+      Previous
     </button>
-    <span className="text-gray-400">
+    <span className="text-neutral-500">
       Page {currentPage} of {totalPages}
     </span>
     <button
-      className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded disabled:opacity-50"
+      className="border border-neutral-700 text-white px-3 py-1 rounded disabled:opacity-50 hover:border-white transition"
       onClick={() => onPageChange(currentPage + 1)}
       disabled={currentPage === totalPages}
     >
-      Next ➡️
+      Next
     </button>
   </div>
 );

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import dataFile from './data.json'; // Pastikan file JSON valid
+import dataFile from './data.json';
 
 export default function HashtagIdeaExplorer() {
   const [tags, setTags] = useState([]);
@@ -11,38 +11,27 @@ export default function HashtagIdeaExplorer() {
   const [dailyMotivation, setDailyMotivation] = useState('');
 
   useEffect(() => {
-    // Validasi dan parsing dari file JSON
     if (dataFile && typeof dataFile === 'object') {
       const { general = [], character = [] } = dataFile;
       setDataJson({ general, character });
     }
 
-    // Motivasi harian (acak berdasarkan tanggal)
-    const motivasiAnimeUwu = [
-      "Ganbatte ne~! 💪✨ You got this, just like an anime MC who never gives up! 🌸",
-      "Yatta! 🎉 One more step toward your dream, keep going~ (≧◡≦) 💖",
-      "UwU~ Don't forget to have fun while drawing, okay? 🎨✨",
-      "Today is part of an important *arc* in your life~ Don’t skip it~ (｡•̀ᴗ-)✧",
-      "Ganbatte! You're the protagonist of your own story—never give up! 🌸📖",
-      "Fighto~! Your inner power is just waiting to awaken! 💥💫",
-      "Uwaah~ You're doing great already! Just like a hero in training~ 🏃‍♂️🌟",
-      "Even small steps make a journey—take your time, senpai~ 🚶‍♀️🍃",
-      "Don't be sad, your sparkle hasn't faded~ it's just charging up! ✨(╥﹏╥)",
-      "You're not alone, your nakama believe in you too! 🤝💖",
-      "Kyaa~ So cool! You're leveling up like an RPG hero! 🗡️📈",
-      "If today’s hard, tomorrow is your redemption episode~ hang in there! 🌙🎬",
-      "You're shining brighter than a thousand sakura petals~ 🌸(｡♥‿♥｡)",
-      "Keep drawing, even messy sketches are part of the magic~ ✍️💞",
-      "Nya~! Every mistake is just EXP~ you're grinding IRL! 🐾🎮",
-      "Don't worry if it's slow... even Goku needed training arcs! 💪🔥",
-      "Your smile is your ultimate weapon! Use it wisely~ 😁🌈",
-      "Take a deep breath~ You're in the calm before the climax~ 😌🎵",
-      "Never forget... your story matters, and it's worth watching till the end! 📺✨"
+    const motivations = [
+      "Keep pushing forward. Progress is progress, no matter how small.",
+      "One step at a time. Consistency beats intensity.",
+      "Your creative journey is unique. Embrace it.",
+      "Today's effort becomes tomorrow's skill.",
+      "Start where you are. Use what you have. Do what you can.",
+      "The only way to do great work is to love what you do.",
+      "Every expert was once a beginner.",
+      "Small daily improvements lead to remarkable results.",
+      "Create something today, even if it's imperfect.",
+      "Your potential is limitless. Keep exploring.",
     ];
     const today = new Date().toLocaleDateString();
     const hash = [...today].reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const idx = hash % motivasiAnimeUwu.length;
-    setDailyMotivation(motivasiAnimeUwu[idx]);
+    const idx = hash % motivations.length;
+    setDailyMotivation(motivations[idx]);
   }, []);
 
   const shuffleArray = (array) => {
@@ -89,15 +78,15 @@ export default function HashtagIdeaExplorer() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-900 text-white">
+    <div className="flex flex-col min-h-screen bg-black text-white">
       <Header />
-      <main className="flex-1 py-10 px-4 bg-gray-900">
-        <div className="max-w-4xl mx-auto bg-gray-800 rounded-xl shadow-md border border-gray-700 p-6">
-          <h1 className="text-3xl font-bold mb-6 text-center">Hashtag Idea Explorer</h1>
+      <main className="flex-1 py-10 px-4">
+        <div className="max-w-4xl mx-auto bg-neutral-900 rounded-xl border border-neutral-800 p-6">
+          <h1 className="text-3xl font-bold mb-6 text-center text-white">Hashtag Idea Explorer</h1>
           <div className="flex justify-center mb-6">
             <button
               onClick={generateTags}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+              className="border border-neutral-700 text-white px-6 py-2 rounded-lg transition hover:bg-white hover:text-black hover:border-white font-medium"
             >
               Generate Tags
             </button>
@@ -106,22 +95,22 @@ export default function HashtagIdeaExplorer() {
             {tags.map((tag, idx) => (
               <div
                 key={idx}
-                className="bg-gray-700 border border-gray-600 rounded px-3 py-1 flex items-center space-x-2 shadow"
+                className="bg-black border border-neutral-700 rounded px-3 py-1 flex items-center space-x-2"
               >
                 <span className="text-white font-medium">#{tag.label}</span>
                 <button
                   onClick={() => shuffleTag(idx)}
-                  className="text-gray-400 hover:text-white"
+                  className="text-neutral-500 hover:text-white transition"
                   title={`Shuffle ${tag.category}`}
                 >
-                  🔄
+                  ↻
                 </button>
               </div>
             ))}
           </div>
-          <div className="mt-10 text-center">
-            <h2 className="text-xl font-semibold text-pink-400 mb-2">✨ Daily Motivation ✨</h2>
-            <p className="text-gray-300 italic">{dailyMotivation}</p>
+          <div className="mt-10 text-center border-t border-neutral-800 pt-6">
+            <h2 className="text-xl font-medium text-white mb-2">Daily Motivation</h2>
+            <p className="text-neutral-400 italic">{dailyMotivation}</p>
           </div>
         </div>
       </main>

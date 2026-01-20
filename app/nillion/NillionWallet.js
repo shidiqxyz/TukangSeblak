@@ -78,7 +78,6 @@ export default function Home() {
       const wallet = accounts[0].address;
       setWalletAddress(wallet);
 
-      // Fetch saldo dari LCD
       const response = await fetch(
         `${lcdUrl}/cosmos/bank/v1beta1/balances/${wallet}`
       );
@@ -96,39 +95,48 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-black text-white">
       <Head>
         <title>Keplr Nillion Wallet</title>
         <meta
           name="description"
-          content="Cek saldo wallet Keplr pada jaringan Nillion"
+          content="Check Keplr wallet balance on Nillion network"
         />
       </Head>
 
       <Header />
 
-      <main className="bg-gray-900 text-gray-300 flex-grow flex flex-col items-center justify-center px-4 py-8">
-        <h2 className="text-2xl font-semibold mb-4">Keplr Nillion Wallet</h2>
-        <button
-          onClick={connectKeplr}
-          className={`${
-            isConnected ? "bg-white text-gray-900" : "bg-blue-500 hover:bg-blue-600 text-white"
-          } font-bold py-2 px-4 rounded`}
-          disabled={isConnected}
-        >
-          {isConnected ? "Connected" : "Connect Keplr"}
-        </button>
-        <div className="mt-4">
-          {walletAddress && (
-            <p id="walletAddress" className="text-lg mb-2">
-              Wallet: {walletAddress}
-            </p>
-          )}
-          {balance && (
-            <p id="balance" className="text-lg">
-              Balance: {balance}
-            </p>
-          )}
+      <main className="flex-grow flex flex-col items-center justify-center px-4 py-8">
+        <div className="w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-lg p-8">
+          <h2 className="text-2xl font-bold mb-6 text-center">Keplr Nillion Wallet</h2>
+          <button
+            onClick={connectKeplr}
+            className={`w-full border border-neutral-700 font-medium py-3 px-4 rounded-lg transition ${isConnected
+                ? "bg-white text-black border-white"
+                : "hover:bg-white hover:text-black hover:border-white"
+              }`}
+            disabled={isConnected}
+          >
+            {isConnected ? "Connected" : "Connect Keplr"}
+          </button>
+          <div className="mt-6 space-y-4">
+            {walletAddress && (
+              <div className="p-4 bg-black border border-neutral-800 rounded-lg">
+                <p className="text-sm text-neutral-400">Wallet</p>
+                <p id="walletAddress" className="text-sm font-mono text-white break-all">
+                  {walletAddress}
+                </p>
+              </div>
+            )}
+            {balance && (
+              <div className="p-4 bg-black border border-neutral-800 rounded-lg">
+                <p className="text-sm text-neutral-400">Balance</p>
+                <p id="balance" className="text-lg font-bold text-white">
+                  {balance}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </main>
 

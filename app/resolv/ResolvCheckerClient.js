@@ -1,4 +1,4 @@
-'use client'; // Directive untuk client-side rendering
+'use client';
 
 import { useState } from 'react';
 import Header from '../../components/Header';
@@ -14,7 +14,7 @@ export default function ResolvChecker() {
   };
 
   const formatNumber = (number) => {
-    return new Intl.NumberFormat('id-ID', {
+    return new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(number);
@@ -22,7 +22,7 @@ export default function ResolvChecker() {
 
   const createBoostBadge = (label, value) => {
     return (
-      <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-600 text-white text-xs font-medium mr-2 mb-2">
+      <span className="inline-flex items-center px-3 py-1 rounded border border-neutral-700 bg-black text-white text-xs font-medium mr-2 mb-2">
         {label}: {value}%
       </span>
     );
@@ -32,38 +32,30 @@ export default function ResolvChecker() {
     const { points, leaderboard } = data;
 
     return (
-      <div className="bg-gray-700 rounded-lg p-6 space-y-4">
-        {/* Rank Information */}
+      <div className="bg-black border border-neutral-800 rounded-lg p-6 space-y-4">
         {leaderboard ? (
           <div className="flex items-center space-x-2">
-            <span className="text-lg">🏆</span>
-            <h5 className="text-lg font-bold">
+            <h5 className="text-lg font-bold text-white">
               Rank: <strong>{leaderboard.rank}</strong>
             </h5>
           </div>
         ) : (
-          <div className="bg-yellow-600 text-white rounded-lg p-2">
+          <div className="bg-neutral-800 text-neutral-400 rounded-lg p-2">
             Address not found in leaderboard.
           </div>
         )}
 
-        {/* Total Points */}
-         
         <div className="flex items-center space-x-2">
-          <span className="text-lg">📅</span>
-          <p className="text-lg font-bold">Daily Points: <strong>{formatNumber(points.dailyPoints)}</strong></p>
+          <p className="text-lg font-medium text-neutral-400">Daily Points: <strong className="text-white">{formatNumber(points.dailyPoints)}</strong></p>
         </div>
         <div className="flex items-center space-x-2">
-          <span className="text-lg">📅</span>
-          <h5 className="text-lg font-bold">
-            Total Points: <strong>{formatNumber(points.totalPoints)}</strong>
+          <h5 className="text-lg font-medium text-neutral-400">
+            Total Points: <strong className="text-white">{formatNumber(points.totalPoints)}</strong>
           </h5>
         </div>
 
-        {/* Active Boosts */}
         <div>
-          <h6 className="text-md font-semibold flex items-center space-x-2 mb-2">
-            <span className="text-lg">⚡</span>
+          <h6 className="text-md font-medium flex items-center space-x-2 mb-2 text-white">
             <span>Active Boosts:</span>
           </h6>
           <div className="flex flex-wrap">
@@ -75,57 +67,18 @@ export default function ResolvChecker() {
           </div>
         </div>
 
-        {/* Daily Activities */}
         <div>
-          <h6 className="text-md font-semibold flex items-center space-x-2 mb-2">
-            <span className="text-lg">📊</span>
+          <h6 className="text-md font-medium flex items-center space-x-2 mb-2 text-white">
             <span>Daily Activities:</span>
           </h6>
           <div className="space-y-2">
             {Object.entries(points.dailyActivities)
               .filter(([_, value]) => value > 0)
               .map(([key, value]) => {
-                const activityEmoji = {
-                  referralPoints: '👥',
-                  holdUsrEth: '💎',
-                  holdUsrBase: '💰',
-                  holdStUsrEth: '📈',
-                  holdRlpEth: '📊',
-                  holdRlpBase: '📊',
-                  pendleLiquidity: '💧',
-                  pendleHoldYt: '📈',
-                  pendleHoldUsrYt: '📈',
-                  pendleUsrLiquidity: '💧',
-                  spectraLiquidity: '💧',
-                  spectraHoldYt: '📈',
-                  spectraHoldRlpYt: '📈',
-                  spectraRlpLiquidity: '💧',
-                  spectraHoldUsdcYt: '📈',
-                  spectraUsdcLiquidity: '💧',
-                  spectraWstUsrLiquidity: '💧',
-                  spectraWstUsrYt: '📈',
-                  spectraUsrLiquidity: '💧',
-                  spectraUsrYt: '📈',
-                  eulerUsdcSupplyEth: '🏦',
-                  eulerUsrSupplyEth: '🏦',
-                  eulerWstUsrSupplyEth: '🏦',
-                  eulerRlpSupplyEth: '🏦',
-                  curveUsrLiquidity: '💧',
-                  curveRlpLiquidity: '💧',
-                  curveUsrRlpLiquidity: '💧',
-                  curveUsrGhoLiquidity: '💧',
-                  curveUsrDolaLiquidity: '💧',
-                  aerodromeUsrUsdcLiquidity: '💧',
-                  aerodromeUsrRlpLiquidity: '💧',
-                  uniswapUsrUsdcLiquidity: '💧',
-                  levelDepositUsr: '📥',
-                  levelDepositRlp: '📥',
-                };
                 return (
                   <div key={key} className="flex items-center space-x-2">
-                    <span className="text-lg">{activityEmoji[key] || '✨'}</span>
-                    <p>
-                      {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}: {formatNumber(value)}
+                    <p className="text-neutral-400">
+                      {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}: <span className="text-white">{formatNumber(value)}</span>
                     </p>
                   </div>
                 );
@@ -138,7 +91,7 @@ export default function ResolvChecker() {
 
   const showError = (message, details = null) => {
     return (
-      <div className="bg-red-600 text-white rounded-lg p-4">
+      <div className="bg-neutral-800 text-neutral-400 rounded-lg p-4 border border-neutral-700">
         <strong>Error:</strong> {message}
         {details && <p>{details}</p>}
       </div>
@@ -185,13 +138,10 @@ export default function ResolvChecker() {
         const result = await fetchAddressPoints(address);
         const addressCard = (
           <div key={address} className="mb-6">
-            <div className="bg-gray-700 rounded-lg shadow-md p-6 space-y-4">
-              {/* Address Header */}
-              <h5 className="text-xl font-bold flex items-center space-x-2">
-                <span className="text-lg">🔗</span>
-                <span>{address}</span>
+            <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-6 space-y-4">
+              <h5 className="text-xl font-bold flex items-center space-x-2 text-white">
+                <span className="font-mono text-sm">{address}</span>
               </h5>
-              {/* Result or Error */}
               {result.success ? formatPointsData(result.data) : showError(result.error)}
             </div>
           </div>
@@ -207,27 +157,24 @@ export default function ResolvChecker() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col">
-      {/* Header */}
+    <div className="min-h-screen bg-black text-white flex flex-col">
       <Header />
-
-      {/* Main Content */}
       <main className="flex-grow flex flex-col items-center p-6">
-        <div className="w-full max-w-7xl bg-gray-800 rounded-lg shadow-lg p-8 space-y-6">
-          <h1 className="text-3xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r text-white">
-            Resolv Points Checker 🧮
+        <div className="w-full max-w-7xl bg-neutral-900 border border-neutral-800 rounded-lg p-8 space-y-6">
+          <h1 className="text-3xl font-bold text-center text-white">
+            Resolv Points Checker
           </h1>
           <textarea
             id="addresses"
-            className="w-full p-4 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:border-purple-500 resize-none"
+            className="w-full p-4 bg-black border border-neutral-700 rounded-lg focus:outline-none focus:border-white resize-none text-white placeholder-neutral-500"
             rows="5"
-            placeholder="Enter EVM addresses or ENS names (e.g., vitalik.eth). Separate multiple addresses with commas or new lines."
+            placeholder="Enter EVM addresses or ENS names. Separate multiple addresses with commas or new lines."
             value={addresses}
             onChange={(e) => setAddresses(e.target.value)}
           />
           <button
             id="callApi"
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded transition duration-300"
+            className="w-full border border-neutral-700 text-white font-medium py-3 px-6 rounded-lg transition duration-300 hover:bg-white hover:text-black hover:border-white"
             onClick={handleCheckPoints}
             disabled={loading}
           >
@@ -235,10 +182,7 @@ export default function ResolvChecker() {
           </button>
           {loading && (
             <div className="text-center mt-4">
-              <div className="spinner-border text-purple-500" role="status">
-                <span className="sr-only">Loading...</span>
-              </div>
-              <p>Loading...</p>
+              <p className="text-neutral-400">Loading...</p>
             </div>
           )}
           <div id="results" className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -246,8 +190,6 @@ export default function ResolvChecker() {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
       <Footer />
     </div>
   );

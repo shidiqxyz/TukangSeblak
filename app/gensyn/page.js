@@ -34,42 +34,37 @@ export default function VotePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-900 text-white">
-      {/* Header */}
+    <div className="flex flex-col min-h-screen bg-black text-white">
       <Header />
-
-      {/* Main Content */}
       <main className="flex-grow flex flex-col items-center p-4">
-        <div className="w-full max-w-3xl bg-gray-800 rounded-xl p-8">
-          {/* Header */}
+        <div className="w-full max-w-3xl bg-neutral-900 border border-neutral-800 rounded-xl p-8">
           <header className="text-center mb-8">
-            <h1 className="text-4xl font-extrabold text-transparent bg-clip-text text-white">
-              🧠 Check Gensyn Vote and Wins
+            <h1 className="text-3xl font-bold text-white">
+              Check Gensyn Vote and Wins
             </h1>
-            <p className="mt-2 text-gray-400 text-lg">
+            <p className="mt-2 text-neutral-400 text-lg">
               Check the vote count and total wins for a wallet or peer id.
             </p>
           </header>
 
-          {/* Input Area */}
           <div className="mb-6">
             <div className="mb-4">
-              <label className="block text-sm text-gray-400 mb-2">Wallet Address (optional)</label>
+              <label className="block text-sm text-neutral-400 mb-2">Wallet Address (optional)</label>
               <input
                 type="text"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white placeholder-gray-500"
+                className="w-full px-4 py-3 bg-black border border-neutral-700 rounded-lg focus:outline-none focus:border-white text-white placeholder-neutral-500"
                 placeholder="0x..."
               />
             </div>
             <div className="mb-6">
-              <label className="block text-sm text-gray-400 mb-2">Peer ID (optional)</label>
+              <label className="block text-sm text-neutral-400 mb-2">Peer ID (optional)</label>
               <input
                 type="text"
                 value={peerId}
                 onChange={(e) => setPeerId(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white placeholder-gray-500"
+                className="w-full px-4 py-3 bg-black border border-neutral-700 rounded-lg focus:outline-none focus:border-white text-white placeholder-neutral-500"
                 placeholder="Qm..."
               />
             </div>
@@ -77,44 +72,37 @@ export default function VotePage() {
             <button
               onClick={fetchVoteData}
               disabled={loading || (!address && !peerId)}
-              className={`w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-md transition duration-200 ${
-                loading ? 'opacity-50 cursor-not-allowed' : 'hover:from-blue-700 hover:to-indigo-700'
-              }`}
+              className={`w-full px-6 py-3 border border-neutral-700 text-white font-medium rounded-lg transition duration-200 ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white hover:text-black hover:border-white'
+                }`}
             >
-              {loading ? '⏳ Checking...' : '🚀 Check'}
+              {loading ? 'Checking...' : 'Check'}
             </button>
           </div>
 
-          {/* Error Message */}
           {error && (
-            <div className="text-red-500 text-center mt-6">
-              ⚠️ {error}
+            <div className="text-neutral-500 text-center mt-6">
+              {error}
             </div>
           )}
 
-          {/* Results Table */}
           {result && (
             <div className="mt-8">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-semibold text-gray-300">📋 Results</h2>
+                <h2 className="text-2xl font-bold text-white">Results</h2>
               </div>
 
               <div className="overflow-x-auto">
-                <table className="w-full bg-gray-700 rounded-lg">
+                <table className="w-full bg-black border border-neutral-800 rounded-lg">
                   <thead>
-                    <tr className="bg-gray-600 text-gray-300">
-                      {/* <th className="py-3 px-6 text-left">📍 Address</th> */}
-                      <th className="py-3 px-6 text-left">✅ Vote Count</th>
-                      <th className="py-3 px-6 text-left">💰 Total Wins</th>
-                      {/* <th className="py-3 px-6 text-left">🌐 Peer ID</th> */}
+                    <tr className="bg-neutral-900 text-neutral-400 border-b border-neutral-800">
+                      <th className="py-3 px-6 text-left font-medium">Vote Count</th>
+                      <th className="py-3 px-6 text-left font-medium">Total Wins</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="border-b border-gray-600">
-                      {/* <td className="py-3 px-6 text-gray-300">{address}</td> */}
-                      <td className="py-3 px-6 text-indigo-400 font-semibold">{result.voteCount}</td>
-                      <td className="py-3 px-6 text-green-400 font-semibold">{result.totalWins}</td>
-                      {/* <td className="py-3 px-6 text-gray-400">{peerId}</td> */}
+                    <tr className="border-b border-neutral-800">
+                      <td className="py-3 px-6 text-white font-medium">{result.voteCount}</td>
+                      <td className="py-3 px-6 text-white font-medium">{result.totalWins}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -123,8 +111,6 @@ export default function VotePage() {
           )}
         </div>
       </main>
-
-      {/* Footer */}
       <Footer />
     </div>
   );

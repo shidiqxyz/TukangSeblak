@@ -1,8 +1,7 @@
-import LineaClient from './LineaClient'; // Impor komponen client-side
+import LineaClient from './LineaClient';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 
-// Metadata untuk halaman Linea
 export const metadata = {
   title: "Linea POH & LXP - TukangSeblak",
   description: "Check POH and LXP status for multiple addresses on Linea.",
@@ -10,16 +9,11 @@ export const metadata = {
 
 export default function Linea() {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-900 text-white">
-      {/* Header */}
+    <div className="flex flex-col min-h-screen bg-black text-white">
       <Header />
-
-      {/* Main Content */}
       <main className="flex-grow p-4">
         <LineaClient />
       </main>
-
-      {/* Footer */}
       <Footer />
     </div>
   );

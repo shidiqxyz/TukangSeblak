@@ -19,7 +19,6 @@ export default function McapFdvCalculator() {
     fdvResult: null,
   });
 
-  // Format angka dengan koma
   const formatNumber = (number) => {
     if (!number) return '';
     return new Intl.NumberFormat('en-US', {
@@ -28,17 +27,14 @@ export default function McapFdvCalculator() {
     }).format(number);
   };
 
-  // Format input angka dengan koma
   const formatInputNumber = (value) => {
     return value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
 
-  // Parsing input angka (hanya angka dan titik)
   const parseNumber = (value) => {
     return value.replace(/[^0-9.]/g, '');
   };
 
-  // Perhitungan MCAP (menghasilkan 3 output: price, circulatingSupply, marketCap)
   const calculateMcapValues = () => {
     const price = parseFloat(parseNumber(mcapInputs.price));
     const circulatingSupply = parseFloat(parseNumber(mcapInputs.circulatingSupply));
@@ -48,15 +44,12 @@ export default function McapFdvCalculator() {
     let computedCirculatingSupply = circulatingSupply;
     let computedMarketCap = marketCap;
 
-    // Jika price tidak diisi, hitung dari marketCap dan circulatingSupply
     if (!price && marketCap && circulatingSupply) {
       computedPrice = marketCap / circulatingSupply;
     }
-    // Jika circulatingSupply tidak diisi, hitung dari marketCap dan price
     if (!circulatingSupply && marketCap && price) {
       computedCirculatingSupply = marketCap / price;
     }
-    // Jika marketCap tidak diisi, hitung dari price dan circulatingSupply
     if (!marketCap && price && circulatingSupply) {
       computedMarketCap = price * circulatingSupply;
     }
@@ -67,7 +60,6 @@ export default function McapFdvCalculator() {
     };
   };
 
-  // Perhitungan FDV (menghasilkan 3 output: price, totalSupply, fdv)
   const calculateFdvValues = () => {
     const price = parseFloat(parseNumber(fdvInputs.price));
     const totalSupply = parseFloat(parseNumber(fdvInputs.totalSupply));
@@ -77,15 +69,12 @@ export default function McapFdvCalculator() {
     let computedTotalSupply = totalSupply;
     let computedFdv = fdv;
 
-    // Jika price tidak diisi, hitung dari fdv dan totalSupply
     if (!price && fdv && totalSupply) {
       computedPrice = fdv / totalSupply;
     }
-    // Jika totalSupply tidak diisi, hitung dari fdv dan price
     if (!totalSupply && fdv && price) {
       computedTotalSupply = fdv / price;
     }
-    // Jika fdv tidak diisi, hitung dari price dan totalSupply
     if (!fdv && price && totalSupply) {
       computedFdv = price * totalSupply;
     }
@@ -96,144 +85,125 @@ export default function McapFdvCalculator() {
     };
   };
 
-  // Handler untuk tombol MCAP
   const handleMcapSubmit = () => {
     setResults({ ...results, mcapResult: calculateMcapValues() });
   };
 
-  // Handler untuk tombol FDV
   const handleFdvSubmit = () => {
     setResults({ ...results, fdvResult: calculateFdvValues() });
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-900 text-white">
-      {/* Header */}
+    <div className="min-h-screen flex flex-col bg-black text-white">
       <Header />
-
-      {/* Main Content */}
-      <main className="flex-grow p-6 mx-auto rounded-lg shadow-lg max-w-7xl w-full">
+      <main className="flex-grow p-6 mx-auto max-w-7xl w-full">
         <h1 className="text-3xl font-bold text-center mb-6">
-          MCAP & FDV Calculator 🧮
+          MCAP & FDV Calculator
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* MCAP Section */}
-          <div className="bg-gray-700 rounded-lg p-6 space-y-4">
-            <h2 className="text-2xl font-semibold">Market Cap (MCAP) 📊</h2>
+          <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-6 space-y-4">
+            <h2 className="text-2xl font-bold text-white">Market Cap (MCAP)</h2>
             <input
               type="text"
-              placeholder="Token Price (USD) 💵"
+              placeholder="Token Price (USD)"
               value={formatInputNumber(mcapInputs.price)}
               onChange={(e) =>
                 setMcapInputs({ ...mcapInputs, price: parseNumber(e.target.value) })
               }
-              className="w-full p-3 bg-gray-600 border border-gray-500 rounded focus:outline-none"
+              className="w-full p-3 bg-black border border-neutral-700 rounded-lg focus:outline-none focus:border-white text-white placeholder-neutral-500"
             />
             <input
               type="text"
-              placeholder="Circulating Supply 🔄"
+              placeholder="Circulating Supply"
               value={formatInputNumber(mcapInputs.circulatingSupply)}
               onChange={(e) =>
                 setMcapInputs({ ...mcapInputs, circulatingSupply: parseNumber(e.target.value) })
               }
-              className="w-full p-3 bg-gray-600 border border-gray-500 rounded focus:outline-none"
+              className="w-full p-3 bg-black border border-neutral-700 rounded-lg focus:outline-none focus:border-white text-white placeholder-neutral-500"
             />
             <input
               type="text"
-              placeholder="Market Cap 📈"
+              placeholder="Market Cap"
               value={formatInputNumber(mcapInputs.marketCap)}
               onChange={(e) =>
                 setMcapInputs({ ...mcapInputs, marketCap: parseNumber(e.target.value) })
               }
-              className="w-full p-3 bg-gray-600 border border-gray-500 rounded focus:outline-none"
+              className="w-full p-3 bg-black border border-neutral-700 rounded-lg focus:outline-none focus:border-white text-white placeholder-neutral-500"
             />
             <button
               onClick={handleMcapSubmit}
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded transition"
+              className="w-full border border-neutral-700 text-white font-medium py-3 px-6 rounded-lg transition hover:bg-white hover:text-black hover:border-white"
             >
-              Calculate MCAP 🧮
+              Calculate MCAP
             </button>
             {results.mcapResult && (
               <div className="mt-4 space-y-2">
                 {results.mcapResult.price && (
-                  <p className="text-lg font-semibold">
-                    Token Price: 💵 ${results.mcapResult.price}
-                  </p>
+                  <p className="text-neutral-400">Token Price: <span className="text-white">${results.mcapResult.price}</span></p>
                 )}
                 {results.mcapResult.circulatingSupply && (
-                  <p className="text-lg font-semibold">
-                    Circulating Supply: 🔄 {results.mcapResult.circulatingSupply}
-                  </p>
+                  <p className="text-neutral-400">Circulating Supply: <span className="text-white">{results.mcapResult.circulatingSupply}</span></p>
                 )}
                 {results.mcapResult.marketCap && (
-                  <p className="text-lg font-semibold">
-                    Market Cap: 📊 ${results.mcapResult.marketCap}
-                  </p>
+                  <p className="text-neutral-400">Market Cap: <span className="text-white font-bold">${results.mcapResult.marketCap}</span></p>
                 )}
               </div>
             )}
           </div>
 
           {/* FDV Section */}
-          <div className="bg-gray-700 rounded-lg p-6 space-y-4">
-            <h2 className="text-2xl font-semibold">Fully Diluted Valuation (FDV) 💰</h2>
+          <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-6 space-y-4">
+            <h2 className="text-2xl font-bold text-white">Fully Diluted Valuation (FDV)</h2>
             <input
               type="text"
-              placeholder="Token Price (USD) 💵"
+              placeholder="Token Price (USD)"
               value={formatInputNumber(fdvInputs.price)}
               onChange={(e) =>
                 setFdvInputs({ ...fdvInputs, price: parseNumber(e.target.value) })
               }
-              className="w-full p-3 bg-gray-600 border border-gray-500 rounded focus:outline-none"
+              className="w-full p-3 bg-black border border-neutral-700 rounded-lg focus:outline-none focus:border-white text-white placeholder-neutral-500"
             />
             <input
               type="text"
-              placeholder="Total Supply 🔢"
+              placeholder="Total Supply"
               value={formatInputNumber(fdvInputs.totalSupply)}
               onChange={(e) =>
                 setFdvInputs({ ...fdvInputs, totalSupply: parseNumber(e.target.value) })
               }
-              className="w-full p-3 bg-gray-600 border border-gray-500 rounded focus:outline-none"
+              className="w-full p-3 bg-black border border-neutral-700 rounded-lg focus:outline-none focus:border-white text-white placeholder-neutral-500"
             />
             <input
               type="text"
-              placeholder="FDV 💸"
+              placeholder="FDV"
               value={formatInputNumber(fdvInputs.fdv)}
               onChange={(e) =>
                 setFdvInputs({ ...fdvInputs, fdv: parseNumber(e.target.value) })
               }
-              className="w-full p-3 bg-gray-600 border border-gray-500 rounded focus:outline-none"
+              className="w-full p-3 bg-black border border-neutral-700 rounded-lg focus:outline-none focus:border-white text-white placeholder-neutral-500"
             />
             <button
               onClick={handleFdvSubmit}
-              className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded transition"
+              className="w-full border border-neutral-700 text-white font-medium py-3 px-6 rounded-lg transition hover:bg-white hover:text-black hover:border-white"
             >
-              Calculate FDV 🧮
+              Calculate FDV
             </button>
             {results.fdvResult && (
               <div className="mt-4 space-y-2">
                 {results.fdvResult.price && (
-                  <p className="text-lg font-semibold">
-                    Token Price: 💵 ${results.fdvResult.price}
-                  </p>
+                  <p className="text-neutral-400">Token Price: <span className="text-white">${results.fdvResult.price}</span></p>
                 )}
                 {results.fdvResult.totalSupply && (
-                  <p className="text-lg font-semibold">
-                    Total Supply: 🔢 {results.fdvResult.totalSupply}
-                  </p>
+                  <p className="text-neutral-400">Total Supply: <span className="text-white">{results.fdvResult.totalSupply}</span></p>
                 )}
                 {results.fdvResult.fdv && (
-                  <p className="text-lg font-semibold">
-                    FDV: 💸 ${results.fdvResult.fdv}
-                  </p>
+                  <p className="text-neutral-400">FDV: <span className="text-white font-bold">${results.fdvResult.fdv}</span></p>
                 )}
               </div>
             )}
           </div>
         </div>
       </main>
-
-      {/* Footer */}
       <Footer />
     </div>
   );

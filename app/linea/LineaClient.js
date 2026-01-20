@@ -39,7 +39,6 @@ export default function LineaClient() {
     return foundTier;
   };
 
-  // 🔥 Fungsi untuk hitung Probability Linea
   const calculateProbability = (lxp, lam) => {
     if (!lxp || !lam) return 0;
     return lxp * lam * 1_000_000_000;
@@ -48,12 +47,12 @@ export default function LineaClient() {
   const checkAPI = async () => {
     const trimmedAddresses = addresses.trim();
     if (!trimmedAddresses) {
-      alert('⚠️ Please enter at least one address.');
+      alert('Please enter at least one address.');
       return;
     }
     const addressList = trimmedAddresses.split('\n').filter(addr => addr.trim() !== '');
     if (addressList.length === 0) {
-      alert('❌ No valid addresses found.');
+      alert('No valid addresses found.');
       return;
     }
 
@@ -76,8 +75,6 @@ export default function LineaClient() {
       let totalProbabilityValue = 0;
 
       const formattedResults = resultsData.map(({ address, lxpData, checkData }) => {
-        const pohClass = lxpData.poh ? 'text-green-400' : 'text-red-400';
-        const isFlaggedClass = !lxpData.isFlagged ? 'text-green-400' : 'text-red-400';
         const mapping = { 1: 'Alpha', 2: 'Beta', 3: 'Gamma', 4: 'Delta', 5: 'Omega' };
 
         const checkResults = Object.entries(checkData)
@@ -102,8 +99,6 @@ export default function LineaClient() {
           lamTier,
           probability: probability.toFixed(2),
           checkResults,
-          pohClass,
-          isFlaggedClass,
         };
       });
 
@@ -111,41 +106,40 @@ export default function LineaClient() {
       setTotalLxp(totalLxpValue);
       setTotalProbability(totalProbabilityValue);
     } catch (error) {
-      console.error('🚨 Error fetching API:', error);
-      alert('❌ Error fetching API data. Please try again later.');
+      console.error('Error fetching API:', error);
+      alert('Error fetching API data. Please try again later.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto bg-gray-800 rounded-lg shadow-lg p-6">
-      {/* Judul */}
+    <div className="w-full max-w-7xl mx-auto bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+      {/* Title */}
       <header className="text-center mb-6">
-        <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r text-white flex items-center justify-center">
-          📊 Linea LXP Status Checker 🔍
+        <h1 className="text-3xl font-bold text-white">
+          Linea LXP Status Checker
         </h1>
-        <p className="mt-2 text-gray-400">Check multiple addresses at once ✨</p>
+        <p className="mt-2 text-neutral-400">Check multiple addresses at once</p>
       </header>
 
       {/* Input Area */}
       <div className="mb-6">
         <textarea
           id="addresses"
-          placeholder="Enter addresses (one per line) 🌐"
+          placeholder="Enter addresses (one per line)"
           rows="6"
           value={addresses}
           onChange={(e) => setAddresses(e.target.value)}
-          className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:border-blue-500 resize-none text-white placeholder-gray-500"
+          className="w-full px-4 py-3 bg-black border border-neutral-700 rounded-lg focus:outline-none focus:border-white resize-none text-white placeholder-neutral-500"
         ></textarea>
         <button
           onClick={checkAPI}
           disabled={loading}
-          className={`w-full mt-4 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-md transition duration-200 ${
-            loading ? 'opacity-50 cursor-not-allowed' : 'hover:from-blue-700 hover:to-purple-700'
-          }`}
+          className={`w-full mt-4 px-6 py-3 border border-neutral-700 text-white font-medium rounded-lg transition duration-200 ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white hover:text-black hover:border-white'
+            }`}
         >
-          {loading ? '⏳ Checking...' : '🚀 Check Status'}
+          {loading ? 'Checking...' : 'Check Status'}
         </button>
       </div>
 
@@ -153,39 +147,39 @@ export default function LineaClient() {
       {results.length > 0 && (
         <div id="results" className="block">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-300 flex items-center">
-              📋 Results <span className="ml-2 text-sm text-gray-500">(Total: {results.length})</span>
+            <h2 className="text-xl font-semibold text-white">
+              Results <span className="ml-2 text-sm text-neutral-500">(Total: {results.length})</span>
             </h2>
             <div className="text-right">
-              <p className="text-lg text-green-400 font-semibold">💰 Total LXP: {totalLxp}</p>
-              <p className="text-lg text-purple-400 font-semibold">🎲 Total Probability: {totalProbability.toFixed(2)}</p>
+              <p className="text-lg text-white font-medium">Total LXP: {totalLxp}</p>
+              <p className="text-lg text-neutral-400 font-medium">Total Probability: {totalProbability.toFixed(2)}</p>
             </div>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full bg-gray-700 rounded-lg overflow-hidden">
+            <table className="w-full bg-black border border-neutral-800 rounded-lg overflow-hidden">
               <thead>
-                <tr className="bg-gray-600 text-gray-300">
-                  <th className="py-3 px-4 text-left">📍 Address</th>
-                  <th className="py-3 px-4 text-left">✅ POH</th>
-                  <th className="py-3 px-4 text-left">🚩 isFlagged</th>
-                  <th className="py-3 px-4 text-left">💰 LXP</th>
-                  <th className="py-3 px-4 text-left">📊 LXP-L</th>
-                  <th className="py-3 px-4 text-left">🏷️ LAM Tier</th>
-                  <th className="py-3 px-4 text-left">🎲 Probability Linea</th>
-                  <th className="py-3 px-4 text-left">🌐 Linea Voyager</th>
+                <tr className="bg-neutral-900 text-neutral-400 border-b border-neutral-800">
+                  <th className="py-3 px-4 text-left font-medium">Address</th>
+                  <th className="py-3 px-4 text-left font-medium">POH</th>
+                  <th className="py-3 px-4 text-left font-medium">Flagged</th>
+                  <th className="py-3 px-4 text-left font-medium">LXP</th>
+                  <th className="py-3 px-4 text-left font-medium">LXP-L</th>
+                  <th className="py-3 px-4 text-left font-medium">LAM Tier</th>
+                  <th className="py-3 px-4 text-left font-medium">Probability</th>
+                  <th className="py-3 px-4 text-left font-medium">Voyager</th>
                 </tr>
               </thead>
               <tbody>
                 {results.map((result, index) => (
-                  <tr key={index} className="border-b border-gray-600">
-                    <td className="py-3 px-4 text-gray-300">{result.address}</td>
-                    <td className={`py-3 px-4 ${result.pohClass}`}>{result.poh ? '✅ True' : '❌ False'}</td>
-                    <td className={`py-3 px-4 ${result.isFlaggedClass}`}>{result.isFlagged ? '❌ True' : '✅ False'}</td>
-                    <td className="py-3 px-4 text-yellow-400">💰 {result.lxp}</td>
-                    <td className="py-3 px-4 text-blue-400">📊 {result.lxpL}</td>
-                    <td className="py-3 px-4 text-cyan-400">🏷️ {result.lamTier}</td>
-                    <td className="py-3 px-4 text-purple-400">🎲 {result.probability}</td>
-                    <td className="py-3 px-4 text-gray-400">{result.checkResults}</td>
+                  <tr key={index} className="border-b border-neutral-800">
+                    <td className="py-3 px-4 text-neutral-300 font-mono text-sm">{result.address.slice(0, 10)}...</td>
+                    <td className={`py-3 px-4 ${result.poh ? 'text-white' : 'text-neutral-500'}`}>{result.poh ? 'Yes' : 'No'}</td>
+                    <td className={`py-3 px-4 ${result.isFlagged ? 'text-neutral-500' : 'text-white'}`}>{result.isFlagged ? 'Yes' : 'No'}</td>
+                    <td className="py-3 px-4 text-white">{result.lxp}</td>
+                    <td className="py-3 px-4 text-neutral-400">{result.lxpL}</td>
+                    <td className="py-3 px-4 text-neutral-400">{result.lamTier}</td>
+                    <td className="py-3 px-4 text-neutral-400">{result.probability}</td>
+                    <td className="py-3 px-4 text-neutral-500">{result.checkResults}</td>
                   </tr>
                 ))}
               </tbody>

@@ -95,4 +95,12 @@ export const initialCards = [
     icon: '⏱️',
     thumbnail: '/thumbnails/100s.jpg',
   },
+  {
+    id: 13,
+    title: 'Countdown Timer',
+    category: 'live',
+    href: '/countdown',
+    icon: '⏳',
+    thumbnail: '/thumbnails/countdown.jpg',
+  },
 ];

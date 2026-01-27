@@ -39,32 +39,48 @@ export default function CountdownTimer() {
     };
 
     const playAlarm = useCallback(() => {
-        if (audioRef.current) {
-            audioRef.current.currentTime = 0;
-            audioRef.current.play().catch(e => console.log('Audio play failed:', e));
+        try {
+            if (audioRef.current) {
+                audioRef.current.currentTime = 0;
+                audioRef.current.play().catch(() => { });
+            }
+        } catch (e) {
+            // Ignore audio errors on mobile
         }
     }, []);
 
     const stopAlarm = useCallback(() => {
-        if (audioRef.current) {
-            audioRef.current.pause();
-            audioRef.current.currentTime = 0;
+        try {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.currentTime = 0;
+            }
+        } catch (e) {
+            // Ignore audio errors
         }
     }, []);
 
     const sendNotification = useCallback((label) => {
-        if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification(label ? `⏰ ${label} - Time's Up!` : "⏰ Time's Up!", {
-                body: label ? `Your "${label}" timer has finished.` : 'Your countdown timer has finished.',
-                icon: '/favicon.ico',
-                tag: 'countdown-timer',
-            });
+        try {
+            if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+                new Notification(label ? `⏰ ${label} - Time's Up!` : "⏰ Time's Up!", {
+                    body: label ? `Your "${label}" timer has finished.` : 'Your countdown timer has finished.',
+                    icon: '/favicon.ico',
+                    tag: 'countdown-timer',
+                });
+            }
+        } catch (e) {
+            // Notifications not supported on this device
         }
     }, []);
 
     const requestNotificationPermission = useCallback(async () => {
-        if ('Notification' in window && Notification.permission === 'default') {
-            await Notification.requestPermission();
+        try {
+            if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+                await Notification.requestPermission();
+            }
+        } catch (e) {
+            // Ignore permission errors
         }
     }, []);
 

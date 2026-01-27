@@ -157,6 +157,22 @@ export default function CountdownTimer() {
         return () => clearInterval(interval);
     }, [isRunning, timeLeft, playAlarm, sendNotification, timerLabel]);
 
+    // Update document title with countdown
+    useEffect(() => {
+        if (!showSettings && timeLeft > 0) {
+            const timeDisplay = formatDisplay(timeLeft);
+            document.title = timerLabel ? `${timeDisplay} - ${timerLabel}` : `${timeDisplay} - Countdown`;
+        } else if (isComplete) {
+            document.title = timerLabel ? `⏰ Time's Up! - ${timerLabel}` : `⏰ Time's Up!`;
+        } else {
+            document.title = 'Countdown Timer';
+        }
+
+        return () => {
+            document.title = 'Countdown Timer';
+        };
+    }, [timeLeft, showSettings, isComplete, timerLabel]);
+
     const progress = totalTime > 0 ? ((totalTime - timeLeft) / totalTime) * 100 : 0;
     const hasInput = inputHours > 0 || inputMinutes > 0 || inputSeconds > 0;
 

@@ -302,6 +302,7 @@ export default function CountdownTimer() {
                             </div>
                             <p className="text-neutral-500 text-base sm:text-lg md:text-xl tracking-widest uppercase mt-2 sm:mt-4">
                                 {isComplete ? "Time's Up" : 'Remaining'}
+                            </p>
                         </div>
 
                         {/* Controls */}

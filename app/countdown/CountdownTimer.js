@@ -23,6 +23,7 @@ export default function CountdownTimer() {
 
     const presets = [
         { label: '5m', value: 300 },
+        { label: '10m', value: 600 },
         { label: '25m', value: 1500 }
     ];
 
@@ -196,20 +197,20 @@ export default function CountdownTimer() {
             {/* Back button */}
             <button
                 onClick={handleBack}
-                className="absolute top-8 left-8 text-neutral-500 hover:text-white transition-colors text-sm z-50"
+                className="absolute top-4 left-4 sm:top-6 sm:left-6 md:top-8 md:left-8 text-neutral-500 hover:text-white transition-colors text-xs sm:text-sm z-50 p-2"
             >
                 ← Back
             </button>
 
             {/* Main content */}
-            <div className="relative z-10 text-center">
+            <div className="relative z-10 text-center px-4 sm:px-6 md:px-8 w-full max-w-4xl">
                 {showSettings ? (
                     /* Settings Panel */
                     <>
                         {/* Time Input Display - Large Numbers */}
-                        <div className="mb-12">
+                        <div className="mb-6 sm:mb-8 md:mb-12">
                             <div
-                                className="text-[6rem] md:text-[10rem] font-bold leading-none tracking-tighter flex items-center justify-center"
+                                className="text-[3.5rem] sm:text-[5rem] md:text-[10rem] font-bold leading-none tracking-tighter flex items-center justify-center"
                                 style={{ fontFamily: 'ui-monospace, monospace' }}
                             >
                                 <input
@@ -221,7 +222,7 @@ export default function CountdownTimer() {
                                     placeholder="0"
                                     className="w-[2.5ch] text-center bg-transparent outline-none placeholder-neutral-700 text-white"
                                 />
-                                <span className="text-neutral-600 mx-1">:</span>
+                                <span className="text-neutral-600 mx-0.5 sm:mx-1">:</span>
                                 <input
                                     type="number"
                                     min="0"
@@ -231,7 +232,7 @@ export default function CountdownTimer() {
                                     placeholder="00"
                                     className="w-[2.5ch] text-center bg-transparent outline-none placeholder-neutral-700 text-white"
                                 />
-                                <span className="text-neutral-600 mx-1">:</span>
+                                <span className="text-neutral-600 mx-0.5 sm:mx-1">:</span>
                                 <input
                                     type="number"
                                     min="0"
@@ -242,7 +243,7 @@ export default function CountdownTimer() {
                                     className="w-[2.5ch] text-center bg-transparent outline-none placeholder-neutral-700 text-white"
                                 />
                             </div>
-                            <p className="text-neutral-500 text-xl tracking-widest uppercase mt-4">
+                            <p className="text-neutral-500 text-base sm:text-lg md:text-xl tracking-widest uppercase mt-2 sm:mt-4">
                                 Set Timer
                             </p>
                         </div>
@@ -260,12 +261,12 @@ export default function CountdownTimer() {
                         </div> */}
 
                         {/* Presets */}
-                        <div className="flex flex-wrap gap-3 justify-center mb-12">
+                        <div className="flex flex-wrap gap-2 sm:gap-3 justify-center mb-6 sm:mb-8 md:mb-12">
                             {presets.map((preset) => (
                                 <button
                                     key={preset.label}
                                     onClick={() => applyPreset(preset.value)}
-                                    className="px-6 py-3 border border-neutral-800 text-neutral-400 rounded-lg transition-all duration-300 hover:border-neutral-600 hover:text-white"
+                                    className="px-4 py-2 sm:px-6 sm:py-3 border border-neutral-800 text-neutral-400 rounded-lg transition-all duration-300 hover:border-neutral-600 hover:text-white text-sm sm:text-base"
                                 >
                                     {preset.label}
                                 </button>
@@ -276,7 +277,7 @@ export default function CountdownTimer() {
                         <button
                             onClick={startTimer}
                             disabled={!hasInput}
-                            className="px-12 py-4 border border-neutral-700 text-white font-medium rounded-lg transition-all duration-300 hover:bg-white hover:text-black hover:border-white text-lg disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-white disabled:hover:border-neutral-700"
+                            className="px-8 py-3 sm:px-10 sm:py-3.5 md:px-12 md:py-4 border border-neutral-700 text-white font-medium rounded-lg transition-all duration-300 hover:bg-white hover:text-black hover:border-white text-base sm:text-lg disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-white disabled:hover:border-neutral-700"
                         >
                             Start
                         </button>
@@ -284,14 +285,14 @@ export default function CountdownTimer() {
                 ) : (
                     /* Timer Display */
                     <>
-                        <div className="mb-12">
+                        <div className="mb-6 sm:mb-8 md:mb-12">
                             {timerLabel && (
-                                <p className="text-neutral-400 text-2xl tracking-widest uppercase mb-4">
+                                <p className="text-neutral-400 text-lg sm:text-xl md:text-2xl tracking-widest uppercase mb-2 sm:mb-4">
                                     {timerLabel}
                                 </p>
                             )}
                             <div
-                                className={`text-[10rem] md:text-[14rem] font-bold leading-none tracking-tighter transition-all duration-300 ${isComplete ? 'text-white animate-pulse' : 'text-white'}`}
+                                className={`text-[4rem] sm:text-[7rem] md:text-[10rem] lg:text-[14rem] font-bold leading-none tracking-tighter transition-all duration-300 ${isComplete ? 'text-white animate-pulse' : 'text-white'}`}
                                 style={{
                                     fontFamily: 'ui-monospace, monospace',
                                     textShadow: isComplete ? '0 0 60px rgba(255,255,255,0.5)' : 'none',
@@ -299,24 +300,23 @@ export default function CountdownTimer() {
                             >
                                 {formatDisplay(timeLeft)}
                             </div>
-                            <p className="text-neutral-500 text-xl tracking-widest uppercase mt-4">
+                            <p className="text-neutral-500 text-base sm:text-lg md:text-xl tracking-widest uppercase mt-2 sm:mt-4">
                                 {isComplete ? "Time's Up" : 'Remaining'}
-                            </p>
                         </div>
 
                         {/* Controls */}
-                        <div className="flex gap-4 justify-center">
+                        <div className="flex gap-2 sm:gap-3 md:gap-4 justify-center flex-wrap">
                             {!isComplete && (
                                 <button
                                     onClick={isRunning ? pauseTimer : resumeTimer}
-                                    className="px-12 py-4 border border-neutral-700 text-white font-medium rounded-lg transition-all duration-300 hover:bg-white hover:text-black hover:border-white text-lg"
+                                    className="px-6 py-3 sm:px-10 sm:py-3.5 md:px-12 md:py-4 border border-neutral-700 text-white font-medium rounded-lg transition-all duration-300 hover:bg-white hover:text-black hover:border-white text-base sm:text-lg"
                                 >
                                     {isRunning ? 'Pause' : 'Resume'}
                                 </button>
                             )}
                             <button
                                 onClick={resetTimer}
-                                className="px-8 py-4 border border-neutral-800 text-neutral-500 font-medium rounded-lg transition-all duration-300 hover:border-neutral-600 hover:text-white text-lg"
+                                className="px-6 py-3 sm:px-8 sm:py-3.5 md:px-8 md:py-4 border border-neutral-800 text-neutral-500 font-medium rounded-lg transition-all duration-300 hover:border-neutral-600 hover:text-white text-base sm:text-lg"
                             >
                                 Reset
                             </button>
@@ -326,15 +326,15 @@ export default function CountdownTimer() {
             </div>
 
             {/* Decorative label */}
-            <div className="absolute bottom-8 text-neutral-600 text-sm tracking-widest">
+            <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 text-neutral-600 text-xs sm:text-sm tracking-widest">
                 COUNTDOWN TIMER
             </div>
 
             {/* Corner accents */}
-            <div className="absolute top-0 left-0 w-32 h-32 border-l border-t border-neutral-800" />
-            <div className="absolute top-0 right-0 w-32 h-32 border-r border-t border-neutral-800" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 border-l border-b border-neutral-800" />
-            <div className="absolute bottom-0 right-0 w-32 h-32 border-r border-b border-neutral-800" />
+            <div className="absolute top-0 left-0 w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 border-l border-t border-neutral-800" />
+            <div className="absolute top-0 right-0 w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 border-r border-t border-neutral-800" />
+            <div className="absolute bottom-0 left-0 w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 border-l border-b border-neutral-800" />
+            <div className="absolute bottom-0 right-0 w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 border-r border-b border-neutral-800" />
 
             {/* Hide number input spinners */}
             <style jsx>{`

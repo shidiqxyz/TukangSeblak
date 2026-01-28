@@ -26,7 +26,7 @@ export default function Content() {
 
   return (
     <div
-      className={`container mx-auto bg-neutral-900 border border-neutral-800 rounded-lg p-6 mt-8 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+      className={`container mx-auto glass-container rounded-lg p-6 mt-8 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}
     >
       {/* Search Bar */}
@@ -37,7 +37,7 @@ export default function Content() {
             placeholder="Search tools..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full p-4 pl-12 border border-neutral-700 rounded-lg focus:outline-none focus:border-white bg-black text-white placeholder-neutral-500 transition-all duration-300"
+            className="w-full p-4 pl-12 luxury-input rounded-lg focus:outline-none text-white placeholder-neutral-500"
           />
           <svg
             className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500"
@@ -55,7 +55,7 @@ export default function Content() {
         <div className="flex flex-wrap gap-3">
           <button
             onClick={() => setSelectedCategory('live')}
-            className={`px-6 py-3 rounded-lg transition-all duration-300 border flex items-center gap-2 ${selectedCategory === 'live'
+            className={`glow-button px-6 py-3 rounded-lg transition-all duration-300 border flex items-center gap-2 ${selectedCategory === 'live'
               ? 'bg-white text-black border-white'
               : 'bg-transparent text-neutral-400 border-neutral-700 hover:border-neutral-500 hover:text-white'
               }`}
@@ -66,7 +66,7 @@ export default function Content() {
           </button>
           <button
             onClick={() => setSelectedCategory('end')}
-            className={`px-6 py-3 rounded-lg transition-all duration-300 border flex items-center gap-2 ${selectedCategory === 'end'
+            className={`glow-button px-6 py-3 rounded-lg transition-all duration-300 border flex items-center gap-2 ${selectedCategory === 'end'
               ? 'bg-white text-black border-white'
               : 'bg-transparent text-neutral-400 border-neutral-700 hover:border-neutral-500 hover:text-white'
               }`}
@@ -77,7 +77,7 @@ export default function Content() {
           </button>
           <button
             onClick={() => setSelectedCategory('all')}
-            className={`px-6 py-3 rounded-lg transition-all duration-300 border ${selectedCategory === 'all'
+            className={`glow-button px-6 py-3 rounded-lg transition-all duration-300 border ${selectedCategory === 'all'
               ? 'bg-white text-black border-white'
               : 'bg-transparent text-neutral-400 border-neutral-700 hover:border-neutral-500 hover:text-white'
               }`}
@@ -88,27 +88,38 @@ export default function Content() {
         </div>
       </div>
 
-      {/* Cards with stagger animation */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Asymmetric Bento Box Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-[160px] gap-3" style={{ gridAutoFlow: 'dense' }}>
         {filteredCards.length > 0 ? (
-          filteredCards.map((card, index) => (
-            <div
-              key={card.id}
-              className="transition-all duration-500"
-              style={{
-                transitionDelay: `${index * 50}ms`,
-                opacity: isVisible ? 1 : 0,
-                transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
-              }}
-            >
-              <Card
-                title={card.title}
-                href={card.href}
-                icon={card.icon}
-                thumbnail={card.thumbnail}
-              />
-            </div>
-          ))
+          filteredCards.map((card, index) => {
+            // Bento box size classes
+            const sizeClasses = {
+              normal: '',
+              wide: 'md:col-span-2',
+              tall: 'row-span-2',
+              large: 'md:col-span-2 row-span-2',
+            };
+
+            return (
+              <div
+                key={card.id}
+                className={`transition-all duration-500 ${sizeClasses[card.size] || ''}`}
+                style={{
+                  transitionDelay: `${index * 50}ms`,
+                  opacity: isVisible ? 1 : 0,
+                  transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+                }}
+              >
+                <Card
+                  title={card.title}
+                  href={card.href}
+                  icon={card.icon}
+                  thumbnail={card.thumbnail}
+                  size={card.size}
+                />
+              </div>
+            );
+          })
         ) : (
           <p className="col-span-full text-center text-neutral-500">
             No tools found.

@@ -1,37 +1,28 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import Link from 'next/link';
 
 export default function RandomAnime() {
   const [anime, setAnime] = useState(null);
-  const [nsfwEnabled, setNsfwEnabled] = useState(false);
-  const [previousAnimes, setPreviousAnimes] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [savedAnimes, setSavedAnimes] = useState([]);
+  const [showSaved, setShowSaved] = useState(false);
+  const [nsfwEnabled, setNsfwEnabled] = useState(false);
+  const [hentaiMode, setHentaiMode] = useState(false);
   const [showNsfwButton, setShowNsfwButton] = useState(false);
   const [clickCount, setClickCount] = useState(0);
-
-  const itemsPerPage = 4;
-  const [prevPage, setPrevPage] = useState(1);
-  const [savedPage, setSavedPage] = useState(1);
+  const [isRevealing, setIsRevealing] = useState(false);
 
   useEffect(() => {
-    const loadState = () => {
-      setPreviousAnimes(loadFromStorage('previousAnimes'));
-      setSavedAnimes(loadFromStorage('savedAnimes'));
-    };
-
-    loadState();
-    getRandomAnime();
+    setSavedAnimes(loadFromStorage('savedAnimes'));
   }, []);
 
   const loadFromStorage = (key) => {
     try {
       const data = localStorage.getItem(key);
       return data ? JSON.parse(data) : [];
-    } catch (error) {
-      console.error('Error loading from storage:', error);
+    } catch {
       return [];
     }
   };
@@ -40,227 +31,381 @@ export default function RandomAnime() {
     try {
       localStorage.setItem(key, JSON.stringify(data));
     } catch (error) {
-      console.error('Error saving to storage:', error);
+      console.error('Error saving:', error);
     }
   };
 
   const getRandomAnime = async () => {
+    setIsLoading(true);
+    setIsRevealing(false);
+
     try {
       const response = await fetch('https://api.jikan.moe/v4/random/anime');
       const data = await response.json();
       const randomAnime = data.data;
 
       const isNSFW = ['Rx - Hentai', 'R+ - Mild Nudity'].includes(randomAnime.rating);
-
       if (isNSFW && !nsfwEnabled) {
-        alert('NSFW content detected. Enable NSFW filter to view.');
+        setTimeout(() => getRandomAnime(), 300);
         return;
       }
 
-      setAnime(randomAnime);
-      updatePreviousAnimes(randomAnime);
+      setTimeout(() => {
+        setAnime(randomAnime);
+        setIsLoading(false);
+        setIsRevealing(true);
+      }, 800);
+
     } catch (error) {
-      console.error('Error fetching anime:', error);
+      console.error('Error:', error);
+      setIsLoading(false);
     }
   };
 
-  const updatePreviousAnimes = (anime) => {
-    const newHistory = [...previousAnimes, anime];
-    setPreviousAnimes(newHistory);
-    saveToStorage('previousAnimes', newHistory);
+  const getRandomHentai = async () => {
+    setIsLoading(true);
+    setIsRevealing(false);
+
+    try {
+      // Get a random page from hentai list (rx rating)
+      const randomPage = Math.floor(Math.random() * 100) + 1;
+      const response = await fetch(
+        `https://api.jikan.moe/v4/anime?rating=rx&page=${randomPage}&limit=25&sfw=false`
+      );
+
+      // Check for rate limiting
+      if (response.status === 429) {
+        console.log('Rate limited, waiting...');
+        setTimeout(() => getRandomHentai(), 2000);
+        return;
+      }
+
+      const data = await response.json();
+
+      // If no results or empty page, try a lower page number
+      if (!data?.data?.length) {
+        const fallbackPage = Math.floor(Math.random() * 20) + 1;
+        const fallbackResponse = await fetch(
+          `https://api.jikan.moe/v4/anime?rating=rx&page=${fallbackPage}&limit=25&sfw=false`
+        );
+        const fallbackData = await fallbackResponse.json();
+
+        if (fallbackData?.data?.length > 0) {
+          const randomIndex = Math.floor(Math.random() * fallbackData.data.length);
+          const randomAnime = fallbackData.data[randomIndex];
+
+          setTimeout(() => {
+            setAnime(randomAnime);
+            setIsLoading(false);
+            setIsRevealing(true);
+          }, 500);
+          return;
+        }
+
+        setTimeout(() => getRandomHentai(), 1000);
+        return;
+      }
+
+      // Pick a random anime from the results
+      const randomIndex = Math.floor(Math.random() * data.data.length);
+      const randomAnime = data.data[randomIndex];
+
+      setTimeout(() => {
+        setAnime(randomAnime);
+        setIsLoading(false);
+        setIsRevealing(true);
+      }, 500);
+
+    } catch (error) {
+      console.error('Error:', error);
+      setTimeout(() => getRandomHentai(), 1500);
+    }
   };
 
   const handleSaveAnime = () => {
-    if (!anime || savedAnimes.some(saved => saved.mal_id === anime.mal_id)) {
-      alert('Anime already saved!');
-      return;
-    }
-
+    if (!anime || savedAnimes.some(s => s.mal_id === anime.mal_id)) return;
     const newSaved = [...savedAnimes, anime];
     setSavedAnimes(newSaved);
     saveToStorage('savedAnimes', newSaved);
   };
 
-  const handleRemovePrevious = (mal_id) => {
-    const updated = previousAnimes.filter(item => item.mal_id !== mal_id);
-    setPreviousAnimes(updated);
-    saveToStorage('previousAnimes', updated);
-  };
-
   const handleRemoveSaved = (mal_id) => {
-    const updated = savedAnimes.filter(item => item.mal_id !== mal_id);
+    const updated = savedAnimes.filter(i => i.mal_id !== mal_id);
     setSavedAnimes(updated);
     saveToStorage('savedAnimes', updated);
   };
 
-  const handleHeaderClick = () => {
+  const handleTitleClick = () => {
     setClickCount(prev => {
-      const newCount = prev + 1;
-      if (newCount >= 10) {
-        setShowNsfwButton(true);
-        alert('Secret NSFW button unlocked!');
-      }
-      return newCount;
+      if (prev + 1 >= 10) setShowNsfwButton(true);
+      return prev + 1;
     });
   };
 
-  const toggleNsfw = () => {
-    setNsfwEnabled(prev => {
-      const newState = !prev;
-      alert(newState ? 'NSFW enabled' : 'NSFW disabled');
-      return newState;
-    });
+  const isAnimeSaved = anime && savedAnimes.some(s => s.mal_id === anime.mal_id);
+
+  const getScoreColor = (score) => {
+    if (!score) return '#555';
+    if (score >= 8) return '#c9a962';
+    if (score >= 7) return '#6b9b7a';
+    if (score >= 6) return '#6b8bb8';
+    return '#777';
   };
-
-  const paginatedPrevious = previousAnimes.slice(
-    (prevPage - 1) * itemsPerPage,
-    prevPage * itemsPerPage
-  );
-
-  const paginatedSaved = savedAnimes.slice(
-    (savedPage - 1) * itemsPerPage,
-    savedPage * itemsPerPage
-  );
 
   return (
-    <div className="min-h-screen flex flex-col bg-black text-white">
-      <Header />
+    <div className="cinematic-container">
+      {/* Backdrop */}
+      <div
+        className="cinematic-backdrop"
+        style={{
+          backgroundImage: anime ? `url(${anime.images.jpg.large_image_url})` : 'none'
+        }}
+      />
+      <div className="cinematic-overlay" />
+      <div className="cinematic-vignette" />
 
-      <main className="flex-1 container mx-auto p-4 grid grid-cols-1 md:grid-cols-[70%_30%] gap-6">
-        <div className="space-y-6">
-          <h1
-            className="text-3xl font-bold text-center md:text-left my-6 cursor-pointer hover:text-neutral-400 transition"
-            onClick={handleHeaderClick}
-          >
-            Random Anime Picker
-          </h1>
-
+      {/* Navigation */}
+      <nav className="cinematic-nav">
+        <Link href="/" className="nav-back">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          <span>Back</span>
+        </Link>
+        <h1
+          className="nav-title cursor-pointer select-none"
+          onClick={handleTitleClick}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="3" y="3" width="18" height="18" rx="3" />
+            <circle cx="8" cy="8" r="1.5" fill="currentColor" />
+            <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+            <circle cx="16" cy="16" r="1.5" fill="currentColor" />
+          </svg>
+          Anime Randomizer
+        </h1>
+        <div className="nav-actions">
           {showNsfwButton && (
-            <button
-              className={`mb-4 block mx-auto md:mx-0 px-4 py-2 rounded-lg border transition ${nsfwEnabled ? 'bg-white text-black border-white' : 'border-neutral-700 hover:border-white'
-                }`}
-              onClick={toggleNsfw}
-            >
-              {nsfwEnabled ? 'NSFW Enabled' : 'NSFW Disabled'}
-            </button>
+            <>
+              <button
+                className={`nav-btn ${nsfwEnabled ? 'active' : ''}`}
+                onClick={() => setNsfwEnabled(!nsfwEnabled)}
+              >
+                {nsfwEnabled ? 'R18' : '18+'}
+              </button>
+              <button
+                className={`nav-btn ${hentaiMode ? 'hentai-active' : 'hentai'}`}
+                onClick={() => setHentaiMode(!hentaiMode)}
+              >
+                H
+              </button>
+            </>
           )}
-
           <button
-            className="w-full py-3 px-6 rounded-lg text-lg font-medium border border-neutral-700 transition hover:bg-white hover:text-black hover:border-white mb-4"
-            onClick={getRandomAnime}
+            className="nav-btn"
+            onClick={() => setShowSaved(!showSaved)}
           >
-            Get Random Anime
+            <span className="saved-count">{savedAnimes.length}</span>
+            <span>Saved</span>
           </button>
+        </div>
+      </nav>
 
-          {anime && (
-            <div className="anime-card bg-neutral-900 border border-neutral-800 rounded-lg p-4 grid grid-cols-1 md:grid-cols-[30%_70%] gap-4">
-              <div className="relative rounded-lg overflow-hidden">
-                <img
-                  src={anime.images.jpg.large_image_url}
-                  alt={anime.title}
-                  className="w-full h-64 object-cover"
-                />
+      {/* Main Content */}
+      <main className="cinematic-main">
+        {/* Loading State */}
+        {isLoading && (
+          <div className="cinematic-loading">
+            <div className="loading-spinner">
+              <div className="spinner-ring" />
+            </div>
+            <p>Discovering</p>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!anime && !isLoading && (
+          <div className="cinematic-empty">
+            <h2>Find Your Next Obsession</h2>
+            <p>One click to explore thousands of anime</p>
+          </div>
+        )}
+
+        {/* Anime Display */}
+        {anime && !isLoading && (
+          <div className={`cinematic-content ${isRevealing ? 'reveal' : ''}`}>
+            {/* Poster */}
+            <div className="cinematic-poster">
+              <img
+                src={anime.images.jpg.large_image_url}
+                alt={anime.title}
+              />
+              <div className="poster-frame" />
+            </div>
+
+            {/* Info Panel */}
+            <div className="cinematic-info">
+              {/* Title Block */}
+              <div className="title-block">
+                <span className="title-label">Title</span>
+                <h1 className="anime-title">{anime.title}</h1>
+                {anime.title_japanese && (
+                  <p className="anime-title-jp">{anime.title_japanese}</p>
+                )}
               </div>
-              <div className="space-y-4">
-                <h2 className="text-xl font-bold text-white">{anime.title}</h2>
-                <p className="text-neutral-400 line-clamp-3">{anime.synopsis || 'No synopsis available'}</p>
 
-                <div className="grid grid-cols-2 gap-4 text-neutral-400">
-                  <div>Genre: {anime.genres.map(g => g.name).join(', ')}</div>
-                  <div>Score: {anime.score || 'N/A'}</div>
-                  <div>Episodes: {anime.episodes || 'N/A'}</div>
-                  <div>Status: {anime.status}</div>
+              {/* Stats Row */}
+              <div className="stats-row">
+                <div className="stat-item featured">
+                  <span className="stat-value" style={{ color: getScoreColor(anime.score) }}>
+                    {anime.score || '—'}
+                  </span>
+                  <span className="stat-label">Score</span>
                 </div>
+                <div className="stat-item">
+                  <span className="stat-value">{anime.episodes || '—'}</span>
+                  <span className="stat-label">Episodes</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-value">{anime.year || '—'}</span>
+                  <span className="stat-label">Year</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-value">{anime.type || '—'}</span>
+                  <span className="stat-label">Format</span>
+                </div>
+              </div>
 
-                <button
-                  className="border border-neutral-700 text-white px-4 py-2 rounded-lg transition hover:bg-white hover:text-black hover:border-white"
-                  onClick={handleSaveAnime}
+              {/* Genres */}
+              {anime.genres.length > 0 && (
+                <div className="genres-section">
+                  <span className="section-label">Genres</span>
+                  <div className="genres-row">
+                    {anime.genres.slice(0, 4).map(g => (
+                      <span key={g.mal_id} className="genre-tag">{g.name}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Synopsis */}
+              <div className="synopsis-section">
+                <span className="section-label">Synopsis</span>
+                <p className="synopsis-text">
+                  {anime.synopsis || 'No synopsis available for this title.'}
+                </p>
+              </div>
+
+              {/* Meta Info */}
+              <div className="meta-row">
+                <div className="meta-item">
+                  <span className="meta-label">Status</span>
+                  <span className="meta-value">{anime.status}</span>
+                </div>
+                <div className="meta-item">
+                  <span className="meta-label">Studios</span>
+                  <span className="meta-value">
+                    {anime.studios?.map(s => s.name).join(', ') || 'Unknown'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="action-row">
+                <a
+                  href={anime.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="cine-btn primary"
                 >
-                  Save Anime
+                  View on MAL
+                </a>
+                <button
+                  className={`cine-btn ${isAnimeSaved ? 'saved' : 'secondary'}`}
+                  onClick={handleSaveAnime}
+                  disabled={isAnimeSaved}
+                >
+                  {isAnimeSaved ? 'Saved' : 'Save'}
                 </button>
               </div>
             </div>
-          )}
-        </div>
-
-        <div className="space-y-10">
-          <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-hidden">
-            <h3 className="text-lg font-bold mb-4 text-white">Previously Viewed</h3>
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              {paginatedPrevious.length > 0 ? (
-                paginatedPrevious.map((anime) => (
-                  <div key={anime.mal_id} className="bg-black border border-neutral-800 p-2 rounded flex justify-between items-center">
-                    <span className="truncate text-neutral-400">{anime.title}</span>
-                    <button
-                      className="text-neutral-500 hover:text-white ml-2"
-                      onClick={() => handleRemovePrevious(anime.mal_id)}
-                    >
-                      X
-                    </button>
-                  </div>
-                ))
-              ) : (
-                <p className="text-neutral-500">No previous animes</p>
-              )}
-            </div>
-            <Pagination
-              currentPage={prevPage}
-              totalPages={Math.ceil(previousAnimes.length / itemsPerPage)}
-              onPageChange={setPrevPage}
-            />
           </div>
-
-          <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-hidden">
-            <h3 className="text-lg font-bold mb-4 text-white">Saved Anime</h3>
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              {paginatedSaved.length > 0 ? (
-                paginatedSaved.map((anime) => (
-                  <div key={anime.mal_id} className="bg-black border border-neutral-800 p-2 rounded flex justify-between items-center">
-                    <span className="truncate text-neutral-400">{anime.title}</span>
-                    <button
-                      className="text-neutral-500 hover:text-white ml-2"
-                      onClick={() => handleRemoveSaved(anime.mal_id)}
-                    >
-                      X
-                    </button>
-                  </div>
-                ))
-              ) : (
-                <p className="text-neutral-500">No saved animes</p>
-              )}
-            </div>
-            <Pagination
-              currentPage={savedPage}
-              totalPages={Math.ceil(savedAnimes.length / itemsPerPage)}
-              onPageChange={setSavedPage}
-            />
-          </div>
-        </div>
+        )}
       </main>
 
-      <Footer className="mt-auto" />
+      {/* Discover Button */}
+      <div className="cinematic-discover">
+        <button
+          className={`discover-btn ${isLoading ? 'loading' : ''} ${hentaiMode ? 'hentai-mode' : ''}`}
+          onClick={hentaiMode ? getRandomHentai : getRandomAnime}
+          disabled={isLoading}
+        >
+          <span className="discover-text">
+            {isLoading ? 'Discovering' : hentaiMode ? (anime ? 'Next H' : 'H Mode') : (anime ? 'Next' : 'Discover')}
+          </span>
+          <svg className="discover-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Saved Drawer */}
+      <div className={`saved-drawer ${showSaved ? 'open' : ''}`}>
+        <div className="drawer-header">
+          <div>
+            <h3>Saved</h3>
+            <span className="drawer-count">{savedAnimes.length} titles</span>
+          </div>
+          <button className="drawer-close" onClick={() => setShowSaved(false)}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div className="drawer-content">
+          {savedAnimes.length > 0 ? (
+            savedAnimes.map((item) => (
+              <div key={item.mal_id} className={`drawer-item ${anime?.mal_id === item.mal_id ? 'active' : ''}`}>
+                <div
+                  className="drawer-item-clickable"
+                  onClick={() => {
+                    setAnime(item);
+                    setIsRevealing(true);
+                    setShowSaved(false);
+                  }}
+                >
+                  <img src={item.images.jpg.small_image_url} alt={item.title} />
+                  <div className="drawer-item-info">
+                    <span className="drawer-item-title">{item.title}</span>
+                    <span className="drawer-item-meta">{item.type} · {item.score || '—'}</span>
+                  </div>
+                </div>
+                <button
+                  className="drawer-item-remove"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveSaved(item.mal_id);
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className="drawer-empty">
+              <p>No saved anime</p>
+              <span>Save titles to view them here</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Drawer Overlay */}
+      {showSaved && (
+        <div className="drawer-overlay" onClick={() => setShowSaved(false)} />
+      )}
     </div>
   );
 }
-
-const Pagination = ({ currentPage, totalPages, onPageChange }) => (
-  <div className="flex justify-between items-center mt-4">
-    <button
-      className="border border-neutral-700 text-white px-3 py-1 rounded disabled:opacity-50 hover:border-white transition"
-      onClick={() => onPageChange(currentPage - 1)}
-      disabled={currentPage === 1}
-    >
-      Previous
-    </button>
-    <span className="text-neutral-500">
-      Page {currentPage} of {totalPages}
-    </span>
-    <button
-      className="border border-neutral-700 text-white px-3 py-1 rounded disabled:opacity-50 hover:border-white transition"
-      onClick={() => onPageChange(currentPage + 1)}
-      disabled={currentPage === totalPages}
-    >
-      Next
-    </button>
-  </div>
-);

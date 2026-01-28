@@ -11,7 +11,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="relative bg-black text-white py-16 px-4 pt-24 border-b border-neutral-800 overflow-hidden">
+    <header className="relative bg-black text-white py-8 px-4 pt-12 border-b border-neutral-800 overflow-hidden">
       {/* Background grid pattern */}
       <div
         className="absolute inset-0 opacity-[0.03]"
@@ -40,13 +40,13 @@ export default function Header() {
         {/* Main Title with animation */}
         <Link href="/" className="text-center cursor-pointer group">
           <h1
-            className={`text-5xl md:text-6xl font-bold tracking-wider flex items-center justify-center group-hover:text-neutral-300 transition-all duration-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            className={`text-3xl md:text-4xl font-bold tracking-wider flex items-center justify-center group-hover:text-neutral-300 transition-all duration-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
           >
             TukangSeblak
           </h1>
           <h2
-            className={`text-xl font-normal tracking-wide mt-4 flex items-center justify-center text-neutral-400 transition-all duration-500 delay-150 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            className={`text-sm font-normal tracking-wide mt-2 flex items-center justify-center text-neutral-400 transition-all duration-500 delay-150 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
           >
             Just making simple tools for myself

@@ -2,17 +2,21 @@
 
 import Link from 'next/link';
 
-export default function Card({ title, href, icon, thumbnail }) {
+export default function Card({ title, href, icon, thumbnail, size = 'normal' }) {
+  // Dynamic thumbnail height based on size
+  const thumbnailHeightClass = size === 'tall' || size === 'large'
+    ? 'h-full'
+    : 'h-32 md:h-40';
 
   return (
-    <Link href={href || '/'}>
-      <div className="group bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden text-white transition-all duration-300 hover:bg-neutral-800 hover:border-neutral-600 hover:scale-[1.02] hover:shadow-lg hover:shadow-white/5 relative flex flex-col h-full">
+    <Link href={href || '/'} className="block h-full">
+      <div className="group luxury-card bg-neutral-900 rounded-xl overflow-hidden text-white relative flex flex-col h-full">
 
-        {/* Thumbnail Section */}
-        <div className="h-40 w-full overflow-hidden relative bg-neutral-800">
+        {/* Thumbnail Section - fills available space */}
+        <div className={`${thumbnailHeightClass} w-full overflow-hidden relative bg-neutral-800 flex-grow`}>
           {thumbnail ? (
             <div
-              className="absolute inset-0 bg-cover bg-top transition-all duration-500 filter grayscale group-hover:grayscale-0 group-hover:scale-110"
+              className="absolute inset-0 bg-cover bg-center transition-all duration-500 filter grayscale group-hover:grayscale-0 group-hover:scale-110"
               style={{ backgroundImage: `url(${thumbnail})` }}
             />
           ) : (
@@ -22,7 +26,7 @@ export default function Card({ title, href, icon, thumbnail }) {
           )}
 
           {/* Overlay gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/80 to-transparent opacity-60" />
+          <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-neutral-900/40 to-transparent opacity-80" />
         </div>
 
         {/* Content Section */}

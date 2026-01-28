@@ -6,6 +6,7 @@ export const initialCards = [
     href: '/linea',
     icon: '📊',
     thumbnail: '/thumbnails/linea.jpg',
+    size: 'wide',
   },
   {
     id: 2,
@@ -14,6 +15,7 @@ export const initialCards = [
     href: '/monad-send',
     icon: '🚀',
     thumbnail: '/thumbnails/monad.jpg',
+    size: 'normal',
   },
   {
     id: 3,
@@ -22,6 +24,7 @@ export const initialCards = [
     href: '/apr-apy-calculator',
     icon: '🧮',
     thumbnail: '/thumbnails/calculator.jpg',
+    size: 'tall',
   },
   {
     id: 4,
@@ -30,6 +33,7 @@ export const initialCards = [
     href: '/resolv',
     icon: '🔗',
     thumbnail: '/thumbnails/resolv.jpg',
+    size: 'normal',
   },
   {
     id: 5,
@@ -38,6 +42,7 @@ export const initialCards = [
     href: '/mcap-fdv-calculator',
     icon: '📈',
     thumbnail: '/thumbnails/mcap.jpg',
+    size: 'normal',
   },
   {
     id: 6,
@@ -46,6 +51,7 @@ export const initialCards = [
     href: '/randomizer-anime',
     icon: '🎲',
     thumbnail: '/thumbnails/anime.jpg',
+    size: 'large',
   },
   {
     id: 7,
@@ -54,6 +60,7 @@ export const initialCards = [
     href: '/nillion',
     icon: '💰',
     thumbnail: '/thumbnails/nillion.jpg',
+    size: 'tall',
   },
   {
     id: 8,
@@ -62,6 +69,7 @@ export const initialCards = [
     href: '/gensyn',
     icon: '⚙️',
     thumbnail: '/thumbnails/gensyn.jpg',
+    size: 'normal',
   },
   {
     id: 9,
@@ -70,6 +78,7 @@ export const initialCards = [
     href: '/sss',
     icon: '🔐',
     thumbnail: '/thumbnails/sss.jpg',
+    size: 'normal',
   },
   {
     id: 10,
@@ -78,6 +87,7 @@ export const initialCards = [
     href: '/illustration-challange',
     icon: '🎨',
     thumbnail: '/thumbnails/illustration.jpg',
+    size: 'wide',
   },
   {
     id: 11,
@@ -86,6 +96,7 @@ export const initialCards = [
     href: '/base-learn',
     icon: '📚',
     thumbnail: '/thumbnails/base.jpg',
+    size: 'normal',
   },
   {
     id: 12,
@@ -94,6 +105,7 @@ export const initialCards = [
     href: '/100-seconds',
     icon: '⏱️',
     thumbnail: '/thumbnails/100s.jpg',
+    size: 'tall',
   },
   {
     id: 13,
@@ -102,5 +114,15 @@ export const initialCards = [
     href: '/countdown',
     icon: '⏳',
     thumbnail: '/thumbnails/countdown.jpg',
+    size: 'wide',
+  },
+  {
+    id: 14,
+    title: 'WA Contactless',
+    category: 'live',
+    href: '/wa-contactless',
+    icon: '📱',
+    thumbnail: '/thumbnails/wa-contactless.jpg',
+    size: 'normal',
   },
 ];

@@ -17,6 +17,7 @@ const THUMBNAILS = [
     'base.jpg',
     '100s.jpg',
     'countdown.jpg',
+    'wa-contactless.jpg',
 ];
 
 const DOWNLOAD_DIR = path.join(__dirname, '..', 'public', 'thumbnails');

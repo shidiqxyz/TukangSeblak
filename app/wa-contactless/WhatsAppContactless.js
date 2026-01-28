@@ -38,8 +38,8 @@ export default function WhatsAppContactless() {
             waUrl += `?text=${encodeURIComponent(message)}`;
         }
 
-        // Open WhatsApp
-        window.open(waUrl, '_blank');
+        // Open WhatsApp - use location.href for mobile compatibility
+        window.location.href = waUrl;
     };
 
     const handlePhoneChange = (e) => {
